@@ -1,11 +1,12 @@
 <script lang="ts">
 	import '../app.css';
-
-	let { children } = $props();
+	import Header from '$lib/components/Header.svelte';
+	import type { LayoutProps } from './$types';
+	let { children }: LayoutProps = $props();
 </script>
 
-<div class="app">
-	<main>
-		{@render children()}
-	</main>
-</div>
+<Header />
+
+<main class="container mx-auto p-4">
+	{@render children()}
+</main>
