@@ -29,10 +29,28 @@
 		}
 	});
 
+	const avgRating = $derived(
+		performanceEntries.length > 0
+			? performanceEntries.reduce((acc, entry) => acc + entry.rating, 0) / performanceEntries.length
+			: 0
+	);
+
+	function formatTimestamp(isoString: string) {
+		const date = new Date(isoString);
+		return date.toLocaleString('en-US', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric',
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: true
+		});
+	}
+
 	function addEntry(event: Event) {
 		event.preventDefault();
-		if (!description || rating < 1 || rating > 5) {
-			error = 'Please provide a valid description and rating (1-5).';
+		if (!description || rating < 0 || rating > 5) {
+			error = 'Please provide a valid description and rating (0-5).';
 			success = '';
 			return;
 		}
@@ -71,6 +89,9 @@
 
 {#if employee}
 	<div class="p-4">
+		<a href={document.referrer} class="text-blue-500 hover:underline mb-4 inline-block">
+			&larr; Back
+		</a>
 		<h1 class="text-2xl font-bold text-gray-800">{employee.name}</h1>
 		<p class="text-gray-600">
 			{employee.jobTitle}
@@ -89,12 +110,18 @@
 
 		<div class="mt-8">
 			<h2 class="text-xl font-bold text-gray-800">Performance Entries</h2>
+			<div class="flex space-x-4 text-sm text-gray-600 mb-4">
+				<span>Total Entries: {performanceEntries.length}</span>
+				{#if performanceEntries.length > 0}
+					<span>Average Rating: {avgRating.toFixed(1)}/5</span>
+				{/if}
+			</div>
 			<ul class="space-y-4 mt-4">
 				{#each performanceEntries as entry}
 					<li class="p-4 bg-gray-50 rounded-md">
 						<p class="text-gray-800">{entry.description}</p>
 						<div class="flex justify-between items-center mt-2">
-							<span class="text-sm text-gray-500">{new Date(entry.date).toLocaleDateString()}</span>
+							<span class="text-sm text-gray-500">{formatTimestamp(entry.date)}</span>
 							<span class="font-bold text-blue-500">Rating: {entry.rating}/5</span>
 						</div>
 					</li>
@@ -116,11 +143,11 @@
 					<textarea bind:value={description} class="w-full p-2 border rounded" required></textarea>
 				</label>
 				<label class="block">
-					<span class="text-gray-700">Rating (1-5)</span>
+					<span class="text-gray-700">Rating (0-5)</span>
 					<input
 						type="number"
 						bind:value={rating}
-						min="1"
+						min="0"
 						max="5"
 						class="w-full p-2 border rounded"
 						required
