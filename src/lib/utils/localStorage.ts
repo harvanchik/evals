@@ -34,8 +34,8 @@ export function saveJobTitles(jobTitles: JobTitle[]) {
 export function initializeMockData() {
 	if (!localStorage.getItem(EMPLOYEES_KEY)) {
 		const mockEmployees: Employee[] = [
-			{ id: 1, name: 'John Doe', jobTitle: 'Developer', department: 'IT' },
-			{ id: 2, name: 'Jane Smith', jobTitle: 'Designer', department: 'Design' }
+			{ id: 1, name: 'John Doe', jobTitle: 'Developer', archived: false },
+			{ id: 2, name: 'Jane Smith', jobTitle: 'Designer', archived: false }
 		];
 		saveEmployees(mockEmployees);
 	}
@@ -55,9 +55,9 @@ export function initializeMockData() {
 
 	if (!localStorage.getItem(JOB_TITLES_KEY)) {
 		const mockJobTitles: JobTitle[] = [
-			{ id: 1, name: 'Developer' },
-			{ id: 2, name: 'Designer' },
-			{ id: 3, name: 'Manager' }
+			{ id: 1, name: 'Developer', description: 'Writes code', color: '#3b82f6' },
+			{ id: 2, name: 'Designer', description: 'Designs things', color: '#a855f7' },
+			{ id: 3, name: 'Manager', description: 'Manages people', color: '#ef4444' }
 		];
 		saveJobTitles(mockJobTitles);
 	}

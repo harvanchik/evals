@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import {
 		getEmployees,
 		getPerformanceEntries,
-		savePerformanceEntries
+		savePerformanceEntries,
+		saveEmployees
 	} from '$lib/utils/localStorage';
 	import type { Employee, PerformanceEntry } from '$lib/types';
 	import { page } from '$app/state';
@@ -53,14 +55,37 @@
 			error = '';
 		}
 	}
+
+	function archiveEmployee() {
+		if (employee) {
+			const employees = getEmployees();
+			const index = employees.findIndex((e: Employee) => e.id === employee!.id);
+			if (index !== -1) {
+				employees[index].archived = true;
+				saveEmployees(employees);
+				goto('/employees');
+			}
+		}
+	}
 </script>
 
 {#if employee}
 	<div class="p-4">
 		<h1 class="text-2xl font-bold text-gray-800">{employee.name}</h1>
 		<p class="text-gray-600">
-			{employee.jobTitle} - {employee.department}
+			{employee.jobTitle}
 		</p>
+		<a
+			href="/employees/{employee.id}/edit"
+			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4 inline-block"
+			>Edit Employee</a
+		>
+
+		<button
+			onclick={archiveEmployee}
+			class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mt-4 ml-2 inline-block"
+			>Archive Employee</button
+		>
 
 		<div class="mt-8">
 			<h2 class="text-xl font-bold text-gray-800">Performance Entries</h2>

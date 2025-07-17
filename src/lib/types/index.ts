@@ -2,7 +2,7 @@ export interface Employee {
 	id: number;
 	name: string;
 	jobTitle: string;
-	department: string;
+	archived: boolean;
 }
 
 export interface PerformanceEntry {
@@ -16,4 +16,6 @@ export interface PerformanceEntry {
 export interface JobTitle {
 	id: number;
 	name: string;
+	description?: string;
+	color?: string;
 }
