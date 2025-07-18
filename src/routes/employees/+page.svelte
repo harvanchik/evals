@@ -26,6 +26,10 @@
 		>Create Employee</a
 	>
 	<a
+		href="/employees/bulk"
+		class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 ml-2">Bulk Add Employees</a
+	>
+	<a
 		href="/employees/archived"
 		class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 ml-2">View Archived</a
 	>
