@@ -136,7 +136,7 @@
 </svelte:head>
 
 <section>
-	<div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+	<div class="mb-8 grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
 		<SummaryCard title="Active Employees" value={activeEmployees.length} />
 		<SummaryCard title="Entries Written" value={totalEntries} />
 		<SummaryCard title="Average Rating" value={averageRating.toFixed(2)} />
