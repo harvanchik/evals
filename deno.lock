@@ -10,6 +10,8 @@
     "npm:@tailwindcss/forms@~0.5.10": "0.5.10_tailwindcss@4.1.11",
     "npm:@tailwindcss/typography@~0.5.16": "0.5.16_tailwindcss@4.1.11",
     "npm:@tailwindcss/vite@^4.1.11": "4.1.11_vite@7.0.4__picomatch@4.0.3",
+    "npm:@xata.io/client@latest": "0.30.1_typescript@5.8.3",
+    "npm:@xata.io/client@~0.30.1": "0.30.1_typescript@5.8.3",
     "npm:eslint-config-prettier@^10.1.5": "10.1.5_eslint@9.31.0",
     "npm:eslint-plugin-svelte@^3.11.0": "3.11.0_eslint@9.31.0_svelte@5.36.4__acorn@8.15.0_postcss@8.5.6",
     "npm:eslint@^9.31.0": "9.31.0",
@@ -21,6 +23,7 @@
     "npm:tailwindcss@^4.1.11": "4.1.11",
     "npm:typescript-eslint@^8.37.0": "8.37.0_eslint@9.31.0_typescript@5.8.3_@typescript-eslint+parser@8.37.0__eslint@9.31.0__typescript@5.8.3",
     "npm:typescript@^5.8.3": "5.8.3",
+    "npm:vite@7.0.4": "7.0.4_picomatch@4.0.3",
     "npm:vite@^7.0.4": "7.0.4_picomatch@4.0.3"
   },
   "npm": {
@@ -1448,6 +1451,12 @@
         "eslint-visitor-keys@4.2.1"
       ]
     },
+    "@xata.io/client@0.30.1_typescript@5.8.3": {
+      "integrity": "sha512-dAzDPHmIfenVIpF39m1elmW5ngjWu2mO8ZqJBN7dmYdXr98uhPANfLdVZnc3mUNG+NH37LqY1dSO862hIo2oRw==",
+      "dependencies": [
+        "typescript"
+      ]
+    },
     "acorn-jsx@5.3.2_acorn@8.15.0": {
       "integrity": "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==",
       "dependencies": [
@@ -2467,6 +2476,9 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "npm:@xata.io/client@latest"
+    ],
     "packageJson": {
       "dependencies": [
         "npm:@eslint/compat@^1.3.1",
@@ -2478,6 +2490,7 @@
         "npm:@tailwindcss/forms@~0.5.10",
         "npm:@tailwindcss/typography@~0.5.16",
         "npm:@tailwindcss/vite@^4.1.11",
+        "npm:@xata.io/client@~0.30.1",
         "npm:eslint-config-prettier@^10.1.5",
         "npm:eslint-plugin-svelte@^3.11.0",
         "npm:eslint@^9.31.0",

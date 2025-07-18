@@ -140,7 +140,7 @@
 		<SummaryCard title="Active Employees" value={activeEmployees.length} />
 		<SummaryCard title="Entries Written" value={totalEntries} />
 		<SummaryCard title="Average Rating" value={averageRating.toFixed(2)} />
-		<SummaryCard title="Employees Not Evaluated" value={notEvaluatedCount} />
+		<SummaryCard title="Not Yet Evaluated" value={notEvaluatedCount} />
 	</div>
 	<div class="mb-8">
 		<input

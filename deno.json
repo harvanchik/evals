@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"jsxImportSource": "preact"
+	},
+	"imports": {
+		"@xata.io/client": "npm:@xata.io/client@latest"
+	},
+	"nodeModulesDir": true
+}

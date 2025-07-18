@@ -1,0 +1,7 @@
+{
+  "databaseURL": "https://jh7-s-workspace-bj4527.us-east-1.xata.sh/db/evals",
+  "codegen": {
+    "output": "src/xata.ts",
+    "moduleType": "deno"
+  }
+}

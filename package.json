@@ -15,7 +15,8 @@
 		"updates": "ncu --interactive --format group"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-auto": "^6.0.1"
+		"@sveltejs/adapter-auto": "^6.0.1",
+		"@xata.io/client": "^0.30.1"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.3.1",
