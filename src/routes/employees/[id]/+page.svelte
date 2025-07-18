@@ -96,9 +96,9 @@
 
 {#if employee}
 	<div class="p-4">
-		<a href={document.referrer} class="text-blue-500 hover:underline mb-4 inline-block">
+		<button onclick={() => history.back()} class="text-blue-500 hover:underline mb-4 inline-block">
 			&larr; Back
-		</a>
+		</button>
 		<h1 class="text-2xl font-bold text-gray-800">
 			{employee.nickname || employee.firstName}
 			{employee.lastName}
