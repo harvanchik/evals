@@ -1,0 +1,30 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d1td8nioqhr2s1o716s0",
+    "operations": [
+      {
+        "add_column": {
+          "up": "''",
+          "table": "positions",
+          "column": {
+            "name": "user",
+            "type": "text",
+            "comment": "{\"xata.link\":\"users\"}",
+            "references": {
+              "name": "user_link",
+              "table": "users",
+              "column": "username",
+              "on_delete": "SET NULL"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d1td8nioqhr2s1o716s0",
+  "parent": "mig_d1td4daoqhr2s1o716ng",
+  "schema": "public",
+  "startedAt": "2025-07-18T23:10:23.903321Z"
+}

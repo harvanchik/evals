@@ -114,6 +114,207 @@ const tables = [
 		]
 	},
 	{
+		name: 'entries',
+		checkConstraints: {
+			entries_xata_id_length_xata_id: {
+				name: 'entries_xata_id_length_xata_id',
+				columns: ['xata_id'],
+				definition: 'CHECK ((length(xata_id) < 256))'
+			}
+		},
+		foreignKeys: {},
+		primaryKey: [],
+		uniqueConstraints: {
+			_pgroll_new_entries_xata_id_key: {
+				name: '_pgroll_new_entries_xata_id_key',
+				columns: ['xata_id']
+			}
+		},
+		columns: [
+			{
+				name: 'xata_createdat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_id',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+				comment: ''
+			},
+			{
+				name: 'xata_updatedat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_version',
+				type: 'int',
+				notNull: true,
+				unique: false,
+				defaultValue: '0',
+				comment: ''
+			}
+		]
+	},
+	{
+		name: 'positions',
+		checkConstraints: {
+			positions_xata_id_length_xata_id: {
+				name: 'positions_xata_id_length_xata_id',
+				columns: ['xata_id'],
+				definition: 'CHECK ((length(xata_id) < 256))'
+			}
+		},
+		foreignKeys: {
+			user_link: {
+				name: 'user_link',
+				columns: ['user'],
+				referencedTable: 'users',
+				referencedColumns: ['username'],
+				onDelete: 'SET NULL'
+			}
+		},
+		primaryKey: [],
+		uniqueConstraints: {
+			_pgroll_new_positions_xata_id_key: {
+				name: '_pgroll_new_positions_xata_id_key',
+				columns: ['xata_id']
+			},
+			positions__pgroll_new_title_key: {
+				name: 'positions__pgroll_new_title_key',
+				columns: ['title']
+			}
+		},
+		columns: [
+			{
+				name: 'color',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'description',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'title',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'user',
+				type: 'link',
+				link: { table: 'users' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"users"}'
+			},
+			{
+				name: 'xata_createdat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_id',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+				comment: ''
+			},
+			{
+				name: 'xata_updatedat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_version',
+				type: 'int',
+				notNull: true,
+				unique: false,
+				defaultValue: '0',
+				comment: ''
+			}
+		]
+	},
+	{
+		name: 'tags',
+		checkConstraints: {
+			tags_xata_id_length_xata_id: {
+				name: 'tags_xata_id_length_xata_id',
+				columns: ['xata_id'],
+				definition: 'CHECK ((length(xata_id) < 256))'
+			}
+		},
+		foreignKeys: {},
+		primaryKey: [],
+		uniqueConstraints: {
+			_pgroll_new_tags_xata_id_key: {
+				name: '_pgroll_new_tags_xata_id_key',
+				columns: ['xata_id']
+			}
+		},
+		columns: [
+			{
+				name: 'xata_createdat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_id',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+				comment: ''
+			},
+			{
+				name: 'xata_updatedat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_version',
+				type: 'int',
+				notNull: true,
+				unique: false,
+				defaultValue: '0',
+				comment: ''
+			}
+		]
+	},
+	{
 		name: 'users',
 		checkConstraints: {
 			users_xata_id_length_xata_id: {
@@ -193,11 +394,23 @@ export type InferredTypes = SchemaInference<SchemaTables>;
 export type Employees = InferredTypes['employees'];
 export type EmployeesRecord = Employees & XataRecord;
 
+export type Entries = InferredTypes['entries'];
+export type EntriesRecord = Entries & XataRecord;
+
+export type Positions = InferredTypes['positions'];
+export type PositionsRecord = Positions & XataRecord;
+
+export type Tags = InferredTypes['tags'];
+export type TagsRecord = Tags & XataRecord;
+
 export type Users = InferredTypes['users'];
 export type UsersRecord = Users & XataRecord;
 
 export type DatabaseSchema = {
 	employees: EmployeesRecord;
+	entries: EntriesRecord;
+	positions: PositionsRecord;
+	tags: TagsRecord;
 	users: UsersRecord;
 };
 

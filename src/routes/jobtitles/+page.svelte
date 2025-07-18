@@ -1,137 +1,79 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { getJobTitles, saveJobTitles } from '$lib/utils/localStorage';
-	import type { JobTitle } from '$lib/types';
+	import type { PageProps } from './$types';
 	import ColorInput from '$lib/components/ColorInput.svelte';
 
-	let jobTitles: JobTitle[] = $state([]);
-	let newTitle = $state('');
-	let newDescription = $state('');
-	let newColor = $state('#000000');
-	let editingTitle: JobTitle | null = $state(null);
+	let { data, form }: PageProps = $props();
 
-	onMount(() => {
-		jobTitles = getJobTitles();
-	});
-
-	function addJobTitle(event: Event) {
-		event.preventDefault();
-		if (newTitle && !jobTitles.find((t) => t.name === newTitle)) {
-			const newId = jobTitles.length > 0 ? Math.max(...jobTitles.map((t) => t.id)) + 1 : 1;
-			jobTitles.push({
-				id: newId,
-				name: newTitle,
-				description: newDescription,
-				color: newColor
-			});
-			saveJobTitles(jobTitles);
-			newTitle = '';
-			newDescription = '';
-			newColor = '#000000';
-		}
-	}
-
-	function deleteJobTitle(id: number) {
-		if (confirm('Are you sure you want to delete this job title?')) {
-			jobTitles = jobTitles.filter((t) => t.id !== id);
-			saveJobTitles(jobTitles);
-		}
-	}
-
-	function startEditing(title: JobTitle) {
-		editingTitle = { ...title, color: title.color || '#000000' };
-	}
-
-	function cancelEditing() {
-		editingTitle = null;
-	}
-
-	function updateJobTitle(event: Event) {
-		event.preventDefault();
-		if (editingTitle) {
-			const index = jobTitles.findIndex((t) => t.id === editingTitle!.id);
-			if (index !== -1) {
-				jobTitles[index] = editingTitle;
-				saveJobTitles(jobTitles);
-				editingTitle = null;
-			}
-		}
-	}
+	let positions = $derived(data.positions || []);
+	let color = $state('#000000');
 </script>
 
 <div class="p-4">
 	<h1 class="text-2xl font-bold text-gray-800">Job Titles</h1>
-	<form onsubmit={addJobTitle} class="space-y-4 mt-4">
-		<label class="block">
-			<span class="text-gray-700">New Job Title</span>
-			<input type="text" bind:value={newTitle} class="w-full p-2 border rounded" required />
-		</label>
-		<label class="block">
-			<span class="text-gray-700">Description</span>
-			<textarea bind:value={newDescription} class="w-full p-2 border rounded"></textarea>
-		</label>
-		<label class="block">
-			<span class="text-gray-700">Color</span>
-			<ColorInput bind:value={newColor} />
-		</label>
-		<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-			>Add Job Title</button
-		>
-	</form>
-	<ul class="mt-4 space-y-2">
-		{#each jobTitles as title}
-			<li class="p-2 bg-gray-50 rounded">
-				{#if editingTitle && editingTitle.id === title.id}
-					<form onsubmit={updateJobTitle} class="space-y-4">
-						<label class="block">
-							<span class="text-gray-700">Name</span>
-							<input
-								type="text"
-								bind:value={editingTitle!.name}
-								class="w-full p-2 border rounded"
-								required
-							/>
-						</label>
-						<label class="block">
-							<span class="text-gray-700">Description</span>
-							<textarea bind:value={editingTitle!.description} class="w-full p-2 border rounded"
-							></textarea>
-						</label>
-						<label class="block">
-							<span class="text-gray-700">Color</span>
-							<ColorInput bind:value={editingTitle!.color} />
-						</label>
-						<button
-							type="submit"
-							class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Save</button
-						>
-						<button
-							type="button"
-							onclick={cancelEditing}
-							class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-2">Cancel</button
-						>
-					</form>
-				{:else}
-					<div class="flex justify-between items-center">
-						<div>
-							<h3 class="font-bold" style="color: {title.color};">{title.name}</h3>
-							<p>{title.description}</p>
-						</div>
-						<div>
-							<button
-								onclick={() => startEditing(title)}
-								class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</button
-							>
-							<button
-								onclick={() => deleteJobTitle(title.id)}
-								class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
-							>
-								Delete
-							</button>
-						</div>
-					</div>
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+		<div class="md:col-span-2">
+			<h2 class="text-xl font-semibold text-gray-700">Existing Titles</h2>
+			{#if positions.length}
+				<ul class="space-y-2 mt-2">
+					{#each positions as position (position.id)}
+						<li class="p-4 bg-white rounded-md shadow flex items-center">
+							<div
+								class="w-4 h-4 rounded-full mr-4"
+								style:background-color={position.color || '#ccc'}
+							></div>
+							<div class="flex-grow">
+								<div class="font-bold text-gray-800">{position.title}</div>
+								<div class="text-sm text-gray-600">{position.description}</div>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p>No job titles found.</p>
+			{/if}
+		</div>
+		<div>
+			<h2 class="text-xl font-semibold text-gray-700">Add New Title</h2>
+			<form method="POST" class="p-4 bg-white rounded-md shadow mt-2">
+				<div class="mb-4">
+					<label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+					<input
+						type="text"
+						id="title"
+						name="title"
+						class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+						required
+					/>
+				</div>
+				<div class="mb-4">
+					<label for="description" class="block text-sm font-medium text-gray-700"
+						>Description</label
+					>
+					<textarea
+						id="description"
+						name="description"
+						rows="3"
+						class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+					></textarea>
+				</div>
+				<div class="mb-4">
+					<label for="color" class="block text-sm font-medium text-gray-700">Color</label>
+					<ColorInput bind:value={color} />
+					<input type="hidden" name="color" value={color} />
+				</div>
+				<button
+					type="submit"
+					class="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+				>
+					Add Position
+				</button>
+				{#if form?.success}
+					<p class="text-green-500 text-sm mt-2">Position added successfully!</p>
 				{/if}
-			</li>
-		{/each}
-	</ul>
+				{#if form?.error}
+					<p class="text-red-500 text-sm mt-2">{form.error}</p>
+				{/if}
+			</form>
+		</div>
+	</div>
 </div>
