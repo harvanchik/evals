@@ -150,6 +150,17 @@
 		}
 	}
 
+	function deleteEntry(entryId: number) {
+		if (confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
+			const allEntries = getPerformanceEntries();
+			const updatedEntries = allEntries.filter((e) => e.id !== entryId);
+			savePerformanceEntries(updatedEntries);
+			performanceEntries = performanceEntries.filter((e) => e.id !== entryId);
+			success = 'Performance entry deleted successfully!';
+			error = '';
+		}
+	}
+
 	function toggleHistory(entryId: number) {
 		expandedHistory[entryId] = !expandedHistory[entryId];
 	}
@@ -291,6 +302,11 @@
 									onclick={() => startEditing(entry)}
 									class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
 									>Edit</button
+								>
+								<button
+									onclick={() => deleteEntry(entry.id)}
+									class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs ml-2"
+									>Delete</button
 								>
 								{#if entry.history && entry.history.length > 0}
 									<button
