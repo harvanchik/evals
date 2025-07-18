@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { page } from '$app/state';
 
 	let { data }: PageProps = $props();
 
-	let employee = $derived(data.employee);
-	let performanceEntries = $derived(data.performanceEntries || []);
-	let avgRating = $derived(0); // Placeholder
+	let employee = $derived(data.employees.find((e) => e.id === page.params.id));
+
+	// Placeholder for when performance entries are moved to Xata
+	let performanceEntries = $derived([]);
+	let avgRating = $derived(0);
 </script>
 
 {#if employee}
