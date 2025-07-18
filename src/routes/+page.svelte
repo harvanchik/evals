@@ -18,6 +18,9 @@
 	let sortOption = $state(localStorage.getItem('sortOption') || 'recent');
 	let filterJobTitle = $state(localStorage.getItem('filterJobTitle') || 'all');
 	let search = $state('');
+	let success = $state('');
+	let editingEntry: PerformanceEntry | null = $state(null);
+	let expandedHistory: { [key: number]: boolean } = $state({});
 
 	onMount(() => {
 		initializeMockData();
@@ -27,6 +30,19 @@
 		tags = getTags();
 		applyFiltersAndSorting();
 	});
+
+	const activeEmployees = $derived(employees.filter((e) => !e.archived));
+	const totalEntries = $derived(performanceEntries.length);
+	const averageRating = $derived(
+		totalEntries > 0
+			? performanceEntries.reduce((acc, entry) => acc + entry.rating, 0) / totalEntries
+			: 0
+	);
+	const notEvaluatedCount = $derived(
+		activeEmployees.filter(
+			(emp) => !performanceEntries.some((entry) => entry.employeeId === emp.id)
+		).length
+	);
 
 	$effect(() => {
 		localStorage.setItem('sortOption', sortOption);
@@ -121,10 +137,11 @@
 </svelte:head>
 
 <section>
-	<div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-		<SummaryCard title="Total Employees" value={employees.length} />
-		<SummaryCard title="Total Job Titles" value={jobTitles.length} />
-		<SummaryCard title="Total Tags" value={tags.length} />
+	<div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+		<SummaryCard title="Active Employees" value={activeEmployees.length} />
+		<SummaryCard title="Entries Written" value={totalEntries} />
+		<SummaryCard title="Average Rating" value={averageRating.toFixed(2)} />
+		<SummaryCard title="Employees Not Evaluated" value={notEvaluatedCount} />
 	</div>
 	<div class="mb-8">
 		<input
