@@ -4,13 +4,16 @@
 		initializeMockData,
 		getEmployees,
 		getPerformanceEntries,
-		getJobTitles
+		getJobTitles,
+		getTags
 	} from '$lib/utils/localStorage';
-	import type { Employee, PerformanceEntry, JobTitle } from '$lib/types';
+	import type { Employee, PerformanceEntry, JobTitle, Tag } from '$lib/types';
+	import SummaryCard from '$lib/components/SummaryCard.svelte';
 
 	let employees: Employee[] = $state([]);
 	let performanceEntries: PerformanceEntry[] = $state([]);
 	let jobTitles: JobTitle[] = $state([]);
+	let tags: Tag[] = $state([]);
 	let filteredEmployees: Employee[] = $state([]);
 	let sortOption = $state(localStorage.getItem('sortOption') || 'recent');
 	let filterJobTitle = $state(localStorage.getItem('filterJobTitle') || 'all');
@@ -21,6 +24,7 @@
 		employees = getEmployees();
 		performanceEntries = getPerformanceEntries();
 		jobTitles = getJobTitles();
+		tags = getTags();
 		applyFiltersAndSorting();
 	});
 
@@ -112,106 +116,86 @@
 </script>
 
 <svelte:head>
-	<title>EPT</title>
-	<meta name="description" content="Employee Performance Tracker" />
+	<title>EPT - Dashboard</title>
+	<meta name="description" content="Employee Performance Tracker Dashboard" />
 </svelte:head>
 
 <section>
-	<div class="text-center">
-		<h1
-			class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-fuchsia-400 to-violet-400 inline-block text-transparent bg-clip-text mb-4"
-		>
-			EPT
-		</h1>
-		<p class="text-lg text-gray-600 mb-8">
-			A simple tool to track employee performance and streamline evaluations.
-		</p>
-		<div class="flex justify-center space-x-4">
-			<a
-				href="/employees"
-				class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-				>View Employees</a
+	<div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+		<SummaryCard title="Total Employees" value={employees.length} />
+		<SummaryCard title="Total Job Titles" value={jobTitles.length} />
+		<SummaryCard title="Total Tags" value={tags.length} />
+	</div>
+	<div class="mb-8">
+		<input
+			type="text"
+			id="search"
+			bind:value={search}
+			placeholder="Search for an employee..."
+			class="w-full p-4 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+		/>
+	</div>
+	<div class="flex flex-wrap items-center gap-4 mb-4">
+		<div>
+			<label for="sort" class="block text-sm font-medium text-gray-700">Sort by</label>
+			<select
+				id="sort"
+				bind:value={sortOption}
+				class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 			>
-			<a
-				href="/jobtitles"
-				class="px-6 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
-				>Manage Job Titles</a
+				<option value="recent">Most Recently Evaluated</option>
+				<option value="least-recent">Least Recently Evaluated</option>
+				<option value="not-evaluated">Not Yet Evaluated</option>
+				<option value="highest-avg">Highest Ratings Avg</option>
+				<option value="lowest-avg">Lowest Ratings Avg</option>
+				<option value="most-entries">Most Evaluation Entries</option>
+				<option value="least-entries">Least Evaluation Entries</option>
+			</select>
+		</div>
+		<div>
+			<label for="filter" class="block text-sm font-medium text-gray-700">Filter by Position</label>
+			<select
+				id="filter"
+				bind:value={filterJobTitle}
+				class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 			>
+				<option value="all">All</option>
+				{#each jobTitles as title}
+					<option value={title.name}>{title.name}</option>
+				{/each}
+			</select>
 		</div>
 	</div>
-
-	<div class="mt-12">
-		<h2 class="text-2xl font-bold text-gray-800 mb-4">Employee Overview</h2>
-		<div class="flex space-x-4 mb-4">
-			<div>
-				<label for="search" class="block text-sm font-medium text-gray-700">Search</label>
-				<input
-					type="text"
-					id="search"
-					bind:value={search}
-					class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-				/>
-			</div>
-			<div>
-				<label for="sort" class="block text-sm font-medium text-gray-700">Sort by</label>
-				<select
-					id="sort"
-					bind:value={sortOption}
-					class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-				>
-					<option value="recent">Most Recently Evaluated</option>
-					<option value="least-recent">Least Recently Evaluated</option>
-					<option value="not-evaluated">Not Yet Evaluated</option>
-					<option value="highest-avg">Highest Ratings Avg</option>
-					<option value="lowest-avg">Lowest Ratings Avg</option>
-					<option value="most-entries">Most Evaluation Entries</option>
-					<option value="least-entries">Least Evaluation Entries</option>
-				</select>
-			</div>
-			<div>
-				<label for="filter" class="block text-sm font-medium text-gray-700"
-					>Filter by Position</label
-				>
-				<select
-					id="filter"
-					bind:value={filterJobTitle}
-					class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-				>
-					<option value="all">All</option>
-					{#each jobTitles as title}
-						<option value={title.name}>{title.name}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-			{#each filteredEmployees as employee}
-				<a
-					href="/employees/{employee.id}"
-					class="p-4 bg-gray-50 rounded-md shadow-sm block relative"
-				>
-					<div class="absolute top-2 right-2 flex space-x-1">
-						<span class="text-xs font-bold text-blue-500 bg-blue-100 px-1.5 py-0.5 rounded-full"
-							>{entriesCount(employee.id)} evals</span
-						>
-						{#if entriesCount(employee.id) > 0}
-							<span
-								class="text-xs font-bold text-white px-1.5 py-0.5 rounded-full"
-								style="background-color: {getRatingColor(avgRating(employee.id))};"
-								>{avgRating(employee.id).toFixed(1)} avg</span
-							>
-						{/if}
-					</div>
-					<h3 class="font-bold">{employee.nickname || employee.firstName} {employee.lastName}</h3>
-					<span
-						class="px-2 py-1 text-xs font-semibold text-white rounded-full"
-						style="background-color: {jobTitles.find((jt) => jt.name === employee.jobTitle)
-							?.color || '#cccccc'};"
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+		{#each filteredEmployees as employee}
+			<a
+				href="/employees/{employee.id}"
+				class="p-4 bg-white rounded-lg shadow-md block relative hover:shadow-lg transition-shadow"
+			>
+				<div class="absolute top-2 right-2 flex space-x-1">
+					<span class="text-xs font-bold text-blue-500 bg-blue-100 px-1.5 py-0.5 rounded-full"
+						>{entriesCount(employee.id)} evals</span
 					>
-						{employee.jobTitle}
-					</span>
-				</a>
-			{/each}
-		</div>
+					{#if entriesCount(employee.id) > 0}
+						<span
+							class="text-xs font-bold text-white px-1.5 py-0.5 rounded-full"
+							style="background-color: {getRatingColor(avgRating(employee.id))};"
+							>{avgRating(employee.id).toFixed(1)} avg</span
+						>
+					{/if}
+				</div>
+				<h3 class="font-bold text-lg">
+					{employee.nickname || employee.firstName}
+					{employee.lastName}
+				</h3>
+				<span
+					class="px-2 py-1 text-xs font-semibold text-white rounded-full"
+					style="background-color: {jobTitles.find((jt) => jt.name === employee.jobTitle)?.color ||
+						'#cccccc'};"
+				>
+					{employee.jobTitle}
+				</span>
+			</a>
+		{/each}
 	</div>
 </section>
