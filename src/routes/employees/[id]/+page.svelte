@@ -165,6 +165,18 @@
 		expandedHistory[entryId] = !expandedHistory[entryId];
 	}
 
+	function unarchiveEmployee() {
+		if (employee) {
+			const employees = getEmployees();
+			const index = employees.findIndex((e: Employee) => e.id === employee!.id);
+			if (index !== -1) {
+				employees[index].archived = false;
+				saveEmployees(employees);
+				employee.archived = false; // Update local state to re-enable UI
+			}
+		}
+	}
+
 	function archiveEmployee() {
 		if (employee) {
 			const employees = getEmployees();
@@ -196,17 +208,30 @@
 		>
 			{employee.jobTitle}
 		</span>
-		<a
-			href="/employees/{employee.id}/edit"
-			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4 inline-block"
-			>Edit Employee</a
-		>
+		{#if !employee.archived}
+			<a
+				href="/employees/{employee.id}/edit"
+				class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4 inline-block"
+				>Edit Employee</a
+			>
+		{/if}
 
-		<button
-			onclick={archiveEmployee}
-			class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mt-4 ml-2 inline-block"
-			>Archive Employee</button
-		>
+		{#if !employee.archived}
+			<button
+				onclick={archiveEmployee}
+				class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mt-4 ml-2 inline-block"
+				>Archive Employee</button
+			>
+		{:else}
+			<div class="mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+				This employee is archived.
+				<button
+					onclick={unarchiveEmployee}
+					class="ml-4 px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
+					>Unarchive</button
+				>
+			</div>
+		{/if}
 
 		<div class="mt-8">
 			<h2 class="text-xl font-bold text-gray-800">Performance Entries</h2>
@@ -297,25 +322,35 @@
 								</div>
 								<span class="font-bold text-blue-500">Rating: {entry.rating}/5</span>
 							</div>
-							<div class="mt-2">
-								<button
-									onclick={() => startEditing(entry)}
-									class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
-									>Edit</button
-								>
-								<button
-									onclick={() => deleteEntry(entry.id)}
-									class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs ml-2"
-									>Delete</button
-								>
-								{#if entry.history && entry.history.length > 0}
+							{#if !employee.archived}
+								<div class="mt-2">
+									<button
+										onclick={() => startEditing(entry)}
+										class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+										>Edit</button
+									>
+									<button
+										onclick={() => deleteEntry(entry.id)}
+										class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs ml-2"
+										>Delete</button
+									>
+									{#if entry.history && entry.history.length > 0}
+										<button
+											onclick={() => toggleHistory(entry.id)}
+											class="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-xs ml-2"
+											>View History</button
+										>
+									{/if}
+								</div>
+							{:else if entry.history && entry.history.length > 0}
+								<div class="mt-2">
 									<button
 										onclick={() => toggleHistory(entry.id)}
-										class="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-xs ml-2"
+										class="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-xs"
 										>View History</button
 									>
-								{/if}
-							</div>
+								</div>
+							{/if}
 							{#if expandedHistory[entry.id]}
 								<div class="mt-4 p-2 bg-gray-100 rounded">
 									<h4 class="font-bold text-sm">History</h4>
@@ -351,51 +386,54 @@
 			</ul>
 		</div>
 
-		<div class="mt-8 p-4 bg-gray-50 rounded-md">
-			<h2 class="text-lg font-semibold text-gray-800">Add Performance Entry</h2>
-			{#if error}
-				<p class="text-red-600">{error}</p>
-			{/if}
-			{#if success}
-				<p class="text-green-600">{success}</p>
-			{/if}
-			<form onsubmit={addEntry} class="space-y-4">
-				<label class="block">
-					<span class="text-gray-700">Description</span>
-					<textarea bind:value={description} class="w-full p-2 border rounded" required></textarea>
-				</label>
-				<label class="block">
-					<span class="text-gray-700">Rating (0-5)</span>
-					<input
-						type="number"
-						bind:value={rating}
-						min="0"
-						max="5"
-						class="w-full p-2 border rounded"
-						required
-					/>
-				</label>
-				<label class="block">
-					<span class="text-gray-700">Tags</span>
-					<div class="flex flex-wrap gap-2 mt-2">
-						{#each allTags as tag}
-							<button
-								type="button"
-								onclick={() => toggleTag(tag.id)}
-								class="px-3 py-1 text-sm rounded-full {selectedTagIds.includes(tag.id)
-									? 'bg-blue-500 text-white'
-									: 'bg-gray-200 text-gray-800'}"
-							>
-								{tag.name}
-							</button>
-						{/each}
-					</div>
-				</label>
-				<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-					>Add Entry</button
-				>
-			</form>
-		</div>
+		{#if !employee.archived}
+			<div class="mt-8 p-4 bg-gray-50 rounded-md">
+				<h2 class="text-lg font-semibold text-gray-800">Add Performance Entry</h2>
+				{#if error}
+					<p class="text-red-600">{error}</p>
+				{/if}
+				{#if success}
+					<p class="text-green-600">{success}</p>
+				{/if}
+				<form onsubmit={addEntry} class="space-y-4">
+					<label class="block">
+						<span class="text-gray-700">Description</span>
+						<textarea bind:value={description} class="w-full p-2 border rounded" required
+						></textarea>
+					</label>
+					<label class="block">
+						<span class="text-gray-700">Rating (0-5)</span>
+						<input
+							type="number"
+							bind:value={rating}
+							min="0"
+							max="5"
+							class="w-full p-2 border rounded"
+							required
+						/>
+					</label>
+					<label class="block">
+						<span class="text-gray-700">Tags</span>
+						<div class="flex flex-wrap gap-2 mt-2">
+							{#each allTags as tag}
+								<button
+									type="button"
+									onclick={() => toggleTag(tag.id)}
+									class="px-3 py-1 text-sm rounded-full {selectedTagIds.includes(tag.id)
+										? 'bg-blue-500 text-white'
+										: 'bg-gray-200 text-gray-800'}"
+								>
+									{tag.name}
+								</button>
+							{/each}
+						</div>
+					</label>
+					<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+						>Add Entry</button
+					>
+				</form>
+			</div>
+		{/if}
 	</div>
 {:else}
 	<p>Employee not found.</p>
