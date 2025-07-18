@@ -5,13 +5,15 @@
 		getEmployees,
 		getPerformanceEntries,
 		savePerformanceEntries,
-		saveEmployees
+		saveEmployees,
+		getJobTitles
 	} from '$lib/utils/localStorage';
-	import type { Employee, PerformanceEntry } from '$lib/types';
+	import type { Employee, PerformanceEntry, JobTitle } from '$lib/types';
 	import { page } from '$app/state';
 
 	let employee: Employee | undefined = $state(undefined);
 	let performanceEntries: PerformanceEntry[] = $state([]);
+	let jobTitles: JobTitle[] = $state([]);
 	let description = $state('');
 	let rating = $state(0);
 	let error = $state('');
@@ -27,7 +29,12 @@
 				(entry: PerformanceEntry) => entry.employeeId === employeeId
 			);
 		}
+		jobTitles = getJobTitles();
 	});
+
+	const jobTitleColor = $derived(
+		jobTitles.find((jt) => jt.name === employee?.jobTitle)?.color || '#cccccc'
+	);
 
 	const avgRating = $derived(
 		performanceEntries.length > 0
@@ -93,9 +100,12 @@
 			&larr; Back
 		</a>
 		<h1 class="text-2xl font-bold text-gray-800">{employee.name}</h1>
-		<p class="text-gray-600">
+		<span
+			class="px-2 py-1 text-xs font-semibold text-white rounded-full"
+			style="background-color: {jobTitleColor};"
+		>
 			{employee.jobTitle}
-		</p>
+		</span>
 		<a
 			href="/employees/{employee.id}/edit"
 			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4 inline-block"

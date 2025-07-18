@@ -182,7 +182,13 @@
 						{/if}
 					</div>
 					<h3 class="font-bold">{employee.name}</h3>
-					<p class="text-gray-600">{employee.jobTitle}</p>
+					<span
+						class="px-2 py-1 text-xs font-semibold text-white rounded-full"
+						style="background-color: {jobTitles.find((jt) => jt.name === employee.jobTitle)
+							?.color || '#cccccc'};"
+					>
+						{employee.jobTitle}
+					</span>
 				</a>
 			{/each}
 		</div>
