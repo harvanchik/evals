@@ -9,6 +9,7 @@
 			<a href="/" class="hover:underline">Home</a>
 			<a href="/employees" class="hover:underline">Employees</a>
 			<a href="/jobtitles" class="hover:underline">Job Titles</a>
+			<a href="/tags" class="hover:underline">Tags</a>
 		</div>
 		<div class="md:hidden">
 			<button onclick={() => (showMenu = !showMenu)} class="focus:outline-none">
@@ -34,6 +35,7 @@
 			<a href="/" class="block py-2 px-4 text-sm hover:bg-gray-200">Home</a>
 			<a href="/employees" class="block py-2 px-4 text-sm hover:bg-gray-200">Employees</a>
 			<a href="/jobtitles" class="block py-2 px-4 text-sm hover:bg-gray-200">Job Titles</a>
+			<a href="/tags" class="block py-2 px-4 text-sm hover:bg-gray-200">Tags</a>
 		</div>
 	{/if}
 </header>

@@ -13,6 +13,7 @@ export interface PerformanceEntry {
 	date: string;
 	description: string;
 	rating: number;
+	tagIds?: number[];
 }
 
 export interface JobTitle {
@@ -20,4 +21,9 @@ export interface JobTitle {
 	name: string;
 	description?: string;
 	color?: string;
+}
+
+export interface Tag {
+	id: number;
+	name: string;
 }

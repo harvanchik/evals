@@ -1,8 +1,9 @@
-import type { Employee, PerformanceEntry, JobTitle } from '$lib/types';
+import type { Employee, PerformanceEntry, JobTitle, Tag } from '$lib/types';
 
 const EMPLOYEES_KEY = 'employees';
 const PERFORMANCE_ENTRIES_KEY = 'performanceEntries';
 const JOB_TITLES_KEY = 'jobTitles';
+const TAGS_KEY = 'tags';
 
 export function getEmployees(): Employee[] {
 	const data = localStorage.getItem(EMPLOYEES_KEY);
@@ -29,6 +30,15 @@ export function getJobTitles(): JobTitle[] {
 
 export function saveJobTitles(jobTitles: JobTitle[]) {
 	localStorage.setItem(JOB_TITLES_KEY, JSON.stringify(jobTitles));
+}
+
+export function getTags(): Tag[] {
+	const data = localStorage.getItem(TAGS_KEY);
+	return data ? JSON.parse(data) : [];
+}
+
+export function saveTags(tags: Tag[]) {
+	localStorage.setItem(TAGS_KEY, JSON.stringify(tags));
 }
 
 export function initializeMockData() {
@@ -72,5 +82,17 @@ export function initializeMockData() {
 			{ id: 3, name: 'Manager', description: 'Manages people', color: '#ef4444' }
 		];
 		saveJobTitles(mockJobTitles);
+	}
+
+	if (!localStorage.getItem(TAGS_KEY)) {
+		const mockTags: Tag[] = [
+			{ id: 1, name: 'Teamwork' },
+			{ id: 2, name: 'Excellence' },
+			{ id: 3, name: 'Adaptability' },
+			{ id: 4, name: 'Mentorship' },
+			{ id: 5, name: 'Communication' },
+			{ id: 6, name: 'Respect' }
+		];
+		saveTags(mockTags);
 	}
 }

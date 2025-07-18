@@ -6,16 +6,19 @@
 		getPerformanceEntries,
 		savePerformanceEntries,
 		saveEmployees,
-		getJobTitles
+		getJobTitles,
+		getTags
 	} from '$lib/utils/localStorage';
-	import type { Employee, PerformanceEntry, JobTitle } from '$lib/types';
+	import type { Employee, PerformanceEntry, JobTitle, Tag } from '$lib/types';
 	import { page } from '$app/state';
 
 	let employee: Employee | undefined = $state(undefined);
 	let performanceEntries: PerformanceEntry[] = $state([]);
 	let jobTitles: JobTitle[] = $state([]);
+	let allTags: Tag[] = $state([]);
 	let description = $state('');
 	let rating = $state(0);
+	let selectedTagIds = $state<number[]>([]);
 	let error = $state('');
 	let success = $state('');
 
@@ -30,6 +33,7 @@
 			);
 		}
 		jobTitles = getJobTitles();
+		allTags = getTags();
 	});
 
 	const jobTitleColor = $derived(
@@ -54,6 +58,14 @@
 		});
 	}
 
+	function toggleTag(tagId: number) {
+		if (selectedTagIds.includes(tagId)) {
+			selectedTagIds = selectedTagIds.filter((id) => id !== tagId);
+		} else {
+			selectedTagIds.push(tagId);
+		}
+	}
+
 	function addEntry(event: Event) {
 		event.preventDefault();
 		if (!description || rating < 0 || rating > 5) {
@@ -68,7 +80,8 @@
 				employeeId: employee.id,
 				date: new Date().toISOString(),
 				description,
-				rating
+				rating,
+				tagIds: selectedTagIds
 			};
 			const allEntries = getPerformanceEntries();
 			allEntries.push(newEntry);
@@ -77,6 +90,7 @@
 			success = 'Performance entry added successfully!';
 			description = '';
 			rating = 0;
+			selectedTagIds = [];
 			error = '';
 		}
 	}
@@ -135,6 +149,15 @@
 			<ul class="space-y-4 mt-4">
 				{#each performanceEntries as entry}
 					<li class="p-4 bg-gray-50 rounded-md">
+						<div class="flex space-x-2 mb-2">
+							{#each entry.tagIds || [] as tagId}
+								<span
+									class="px-2 py-1 bg-gray-200 text-gray-800 text-xs font-semibold rounded-full"
+								>
+									{allTags.find((t) => t.id === tagId)?.name}
+								</span>
+							{/each}
+						</div>
 						<p class="text-gray-800">{entry.description}</p>
 						<div class="flex justify-between items-center mt-2">
 							<span class="text-sm text-gray-500">{formatTimestamp(entry.date)}</span>
@@ -168,6 +191,22 @@
 						class="w-full p-2 border rounded"
 						required
 					/>
+				</label>
+				<label class="block">
+					<span class="text-gray-700">Tags</span>
+					<div class="flex flex-wrap gap-2 mt-2">
+						{#each allTags as tag}
+							<button
+								type="button"
+								onclick={() => toggleTag(tag.id)}
+								class="px-3 py-1 text-sm rounded-full {selectedTagIds.includes(tag.id)
+									? 'bg-blue-500 text-white'
+									: 'bg-gray-200 text-gray-800'}"
+							>
+								{tag.name}
+							</button>
+						{/each}
+					</div>
 				</label>
 				<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
 					>Add Entry</button
