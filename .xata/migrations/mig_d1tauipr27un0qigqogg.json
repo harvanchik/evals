@@ -1,0 +1,24 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d1tauipr27un0qigqogg",
+    "operations": [
+      {
+        "add_column": {
+          "table": "employees",
+          "column": {
+            "name": "position",
+            "type": "text",
+            "comment": "",
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d1tauipr27un0qigqogg",
+  "parent": "mig_d1tatppr27un0qigqofg",
+  "schema": "public",
+  "startedAt": "2025-07-18T20:32:19.527105Z"
+}

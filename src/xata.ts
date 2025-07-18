@@ -5,6 +5,115 @@ import { env } from '$env/dynamic/private';
 
 const tables = [
 	{
+		name: 'employees',
+		checkConstraints: {
+			employees_xata_id_length_xata_id: {
+				name: 'employees_xata_id_length_xata_id',
+				columns: ['xata_id'],
+				definition: 'CHECK ((length(xata_id) < 256))'
+			}
+		},
+		foreignKeys: {
+			user_link: {
+				name: 'user_link',
+				columns: ['user'],
+				referencedTable: 'users',
+				referencedColumns: ['username'],
+				onDelete: 'SET NULL'
+			}
+		},
+		primaryKey: [],
+		uniqueConstraints: {
+			_pgroll_new_employees_xata_id_key: {
+				name: '_pgroll_new_employees_xata_id_key',
+				columns: ['xata_id']
+			}
+		},
+		columns: [
+			{
+				name: 'archived',
+				type: 'bool',
+				notNull: false,
+				unique: false,
+				defaultValue: 'false',
+				comment: ''
+			},
+			{
+				name: 'first_name',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'last_name',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'nickname',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'position',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'user',
+				type: 'link',
+				link: { table: 'users' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"users"}'
+			},
+			{
+				name: 'xata_createdat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_id',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+				comment: ''
+			},
+			{
+				name: 'xata_updatedat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_version',
+				type: 'int',
+				notNull: true,
+				unique: false,
+				defaultValue: '0',
+				comment: ''
+			}
+		]
+	},
+	{
 		name: 'users',
 		checkConstraints: {
 			users_xata_id_length_xata_id: {
@@ -81,10 +190,14 @@ const tables = [
 export type SchemaTables = typeof tables;
 export type InferredTypes = SchemaInference<SchemaTables>;
 
+export type Employees = InferredTypes['employees'];
+export type EmployeesRecord = Employees & XataRecord;
+
 export type Users = InferredTypes['users'];
 export type UsersRecord = Users & XataRecord;
 
 export type DatabaseSchema = {
+	employees: EmployeesRecord;
 	users: UsersRecord;
 };
 

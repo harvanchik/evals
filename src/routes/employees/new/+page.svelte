@@ -1,66 +1,64 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { getEmployees, saveEmployees, getJobTitles } from '$lib/utils/localStorage';
-	import type { Employee, JobTitle } from '$lib/types';
-
-	let firstName = $state('');
-	let lastName = $state('');
-	let nickname = $state('');
-	let jobTitle = $state('');
-	let jobTitles: JobTitle[] = $state([]);
-
-	onMount(() => {
-		jobTitles = getJobTitles();
-		if (jobTitles.length > 0) {
-			jobTitle = jobTitles[0].name;
-		}
-	});
-
-	function createEmployee(event: Event) {
-		event.preventDefault();
-		const employees = getEmployees();
-		const newEmployee: Employee = {
-			id: Date.now(),
-			firstName,
-			lastName,
-			nickname,
-			jobTitle,
-			archived: false
-		};
-		employees.push(newEmployee);
-		saveEmployees(employees);
-		goto('/employees');
-	}
+	import type { PageProps } from './$types';
+	let { form }: PageProps = $props();
 </script>
 
+<svelte:head>
+	<title>Create New Employee</title>
+</svelte:head>
+
 <div class="p-4">
-	<h1 class="text-2xl font-bold text-gray-800">Create New Employee</h1>
-	<form onsubmit={createEmployee} class="space-y-4 mt-4">
-		<div class="flex space-x-4">
-			<label class="block w-1/2">
-				<span class="text-gray-700">First Name</span>
-				<input type="text" bind:value={firstName} class="w-full p-2 border rounded" required />
-			</label>
-			<label class="block w-1/2">
-				<span class="text-gray-700">Last Name</span>
-				<input type="text" bind:value={lastName} class="w-full p-2 border rounded" required />
-			</label>
+	<h1 class="text-2xl font-bold mb-4">Create New Employee</h1>
+	<form method="POST" class="space-y-4 max-w-lg">
+		<div>
+			<label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+			<input
+				type="text"
+				id="firstName"
+				name="firstName"
+				class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+				required
+			/>
 		</div>
-		<label class="block">
-			<span class="text-gray-700">Nickname</span>
-			<input type="text" bind:value={nickname} class="w-full p-2 border rounded" />
-		</label>
-		<label class="block">
-			<span class="text-gray-700">Job Title</span>
-			<select bind:value={jobTitle} class="w-full p-2 border rounded">
-				{#each jobTitles as title}
-					<option value={title.name}>{title.name}</option>
-				{/each}
-			</select>
-		</label>
-		<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-			>Create Employee</button
-		>
+		<div>
+			<label for="lastName" class="block text-sm font-medium text-gray-700"
+				>Last Name (Optional)</label
+			>
+			<input
+				type="text"
+				id="lastName"
+				name="lastName"
+				class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+			/>
+		</div>
+		<div>
+			<label for="nickname" class="block text-sm font-medium text-gray-700"
+				>Nickname (Optional)</label
+			>
+			<input
+				type="text"
+				id="nickname"
+				name="nickname"
+				class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+			/>
+		</div>
+		<div>
+			<label for="position" class="block text-sm font-medium text-gray-700">Position</label>
+			<input
+				type="text"
+				id="position"
+				name="position"
+				class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+				required
+			/>
+		</div>
+
+		{#if form?.error}
+			<p class="text-red-500 text-sm">{form.error}</p>
+		{/if}
+
+		<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+			Create Employee
+		</button>
 	</form>
 </div>

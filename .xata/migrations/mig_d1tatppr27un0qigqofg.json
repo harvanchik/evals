@@ -1,0 +1,24 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d1tatppr27un0qigqofg",
+    "operations": [
+      {
+        "add_column": {
+          "table": "employees",
+          "column": {
+            "name": "nickname",
+            "type": "text",
+            "comment": "",
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d1tatppr27un0qigqofg",
+  "parent": "mig_d1tat02oqhr2s1o71650",
+  "schema": "public",
+  "startedAt": "2025-07-18T20:30:32.695618Z"
+}
