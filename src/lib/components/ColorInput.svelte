@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { value = $bindable() } = $props<{ value: string }>();
+	let { value = $bindable('#000000') } = $props<{ value?: string }>();
 
 	function handleInput(e: Event) {
 		const target = e.target as HTMLInputElement;
@@ -21,7 +21,7 @@
 		<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">#</span>
 		<input
 			type="text"
-			value={value.substring(1)}
+			value={(value || '').substring(1)}
 			oninput={handleInput}
 			class="w-full p-2 pl-7 border-t border-b border-r rounded-r-md"
 			maxlength="6"

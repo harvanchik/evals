@@ -13,7 +13,8 @@
 	let filteredEmployees = $derived(
 		employees.filter(
 			(emp) =>
-				emp.name.toLowerCase().includes(search.toLowerCase()) ||
+				(emp.firstName + ' ' + emp.lastName).toLowerCase().includes(search.toLowerCase()) ||
+				(emp.nickname || '').toLowerCase().includes(search.toLowerCase()) ||
 				emp.jobTitle.toLowerCase().includes(search.toLowerCase())
 		)
 	);
@@ -38,7 +39,8 @@
 		{#each filteredEmployees as employee}
 			<li class="p-2 bg-gray-50 rounded">
 				<a href="/employees/{employee.id}" class="text-blue-500 hover:underline">
-					{employee.name} - {employee.jobTitle}
+					{employee.nickname || employee.firstName}
+					{employee.lastName} - {employee.jobTitle}
 				</a>
 			</li>
 		{/each}

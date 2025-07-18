@@ -14,6 +14,7 @@
 	let filteredEmployees: Employee[] = $state([]);
 	let sortOption = $state(localStorage.getItem('sortOption') || 'recent');
 	let filterJobTitle = $state(localStorage.getItem('filterJobTitle') || 'all');
+	let search = $state('');
 
 	onMount(() => {
 		initializeMockData();
@@ -34,6 +35,15 @@
 
 		if (filterJobTitle !== 'all') {
 			tempEmployees = tempEmployees.filter((e) => e.jobTitle === filterJobTitle);
+		}
+
+		// Add this block to handle search
+		if (search) {
+			tempEmployees = tempEmployees.filter(
+				(emp) =>
+					(emp.firstName + ' ' + emp.lastName).toLowerCase().includes(search.toLowerCase()) ||
+					(emp.nickname || '').toLowerCase().includes(search.toLowerCase())
+			);
 		}
 
 		switch (sortOption) {
@@ -132,6 +142,15 @@
 		<h2 class="text-2xl font-bold text-gray-800 mb-4">Employee Overview</h2>
 		<div class="flex space-x-4 mb-4">
 			<div>
+				<label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+				<input
+					type="text"
+					id="search"
+					bind:value={search}
+					class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+				/>
+			</div>
+			<div>
 				<label for="sort" class="block text-sm font-medium text-gray-700">Sort by</label>
 				<select
 					id="sort"
@@ -181,7 +200,7 @@
 							>
 						{/if}
 					</div>
-					<h3 class="font-bold">{employee.name}</h3>
+					<h3 class="font-bold">{employee.nickname || employee.firstName} {employee.lastName}</h3>
 					<span
 						class="px-2 py-1 text-xs font-semibold text-white rounded-full"
 						style="background-color: {jobTitles.find((jt) => jt.name === employee.jobTitle)

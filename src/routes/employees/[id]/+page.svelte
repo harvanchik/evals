@@ -99,7 +99,13 @@
 		<a href={document.referrer} class="text-blue-500 hover:underline mb-4 inline-block">
 			&larr; Back
 		</a>
-		<h1 class="text-2xl font-bold text-gray-800">{employee.name}</h1>
+		<h1 class="text-2xl font-bold text-gray-800">
+			{employee.nickname || employee.firstName}
+			{employee.lastName}
+			{#if employee.nickname}
+				<span class="text-lg text-gray-500">({employee.firstName} {employee.lastName})</span>
+			{/if}
+		</h1>
 		<span
 			class="px-2 py-1 text-xs font-semibold text-white rounded-full"
 			style="background-color: {jobTitleColor};"

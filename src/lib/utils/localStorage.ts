@@ -34,8 +34,20 @@ export function saveJobTitles(jobTitles: JobTitle[]) {
 export function initializeMockData() {
 	if (!localStorage.getItem(EMPLOYEES_KEY)) {
 		const mockEmployees: Employee[] = [
-			{ id: 1, name: 'John Doe', jobTitle: 'Developer', archived: false },
-			{ id: 2, name: 'Jane Smith', jobTitle: 'Designer', archived: false }
+			{
+				id: 1,
+				firstName: 'John',
+				lastName: 'Doe',
+				jobTitle: 'Developer',
+				archived: false
+			},
+			{
+				id: 2,
+				firstName: 'Jane',
+				lastName: 'Smith',
+				jobTitle: 'Designer',
+				archived: false
+			}
 		];
 		saveEmployees(mockEmployees);
 	}

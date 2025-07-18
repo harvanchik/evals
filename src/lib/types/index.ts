@@ -1,6 +1,8 @@
 export interface Employee {
 	id: number;
-	name: string;
+	firstName: string;
+	lastName: string;
+	nickname?: string;
 	jobTitle: string;
 	archived: boolean;
 }

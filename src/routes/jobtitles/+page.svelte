@@ -39,7 +39,7 @@
 	}
 
 	function startEditing(title: JobTitle) {
-		editingTitle = { ...title };
+		editingTitle = { ...title, color: title.color || '#000000' };
 	}
 
 	function cancelEditing() {
