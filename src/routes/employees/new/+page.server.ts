@@ -5,32 +5,32 @@ import { getXataClient } from '../../../xata';
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
 		if (!locals.user) {
-			redirect(303, '/login');
+			redirect(303, '/');
 		}
 
 		const data = await request.formData();
-		const firstName = data.get('firstName') as string;
-		const lastName = data.get('lastName') as string;
+		const first_name = data.get('first_name') as string;
+		const last_name = data.get('last_name') as string;
 		const nickname = data.get('nickname') as string;
 		const position = data.get('position') as string;
 
-		if (!firstName || !position) {
-			return fail(400, {
-				error: 'First name and position are required.'
-			});
+		if (!first_name || !last_name || !position) {
+			return fail(400, { error: 'Missing required fields', success: false });
 		}
 
-		const xata = getXataClient();
+		try {
+			const xata = getXataClient();
+			await xata.db.employees.create({
+				first_name,
+				last_name,
+				nickname,
+				position,
+				user: locals.user.username
+			});
+		} catch (e) {
+			return fail(500, { error: 'Failed to create employee', success: false });
+		}
 
-		await xata.db.employees.create({
-			first_name: firstName,
-			last_name: lastName || undefined,
-			nickname: nickname || undefined,
-			position: position,
-			archived: false,
-			user: locals.user.username
-		});
-
-		redirect(303, '/employees');
+		return { success: true };
 	}
 };
