@@ -4,7 +4,7 @@
 
 <header class="bg-gray-100 text-gray-800 shadow-md">
 	<nav class="container mx-auto px-4 py-2 flex justify-between items-center">
-		<a href="/" class="text-xl font-bold">PerfTracker</a>
+		<a href="/" class="text-xl font-bold">EPT</a>
 		<div class="hidden md:flex space-x-4">
 			<a href="/" class="hover:underline">Home</a>
 			<a href="/employees" class="hover:underline">Employees</a>

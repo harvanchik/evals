@@ -53,7 +53,7 @@
 					const bLast = lastEntry(b.id);
 					if (!aLast) return 1;
 					if (!bLast) return -1;
-					return new Date(bLast.date).getTime() - new Date(aLast.date).getTime();
+					return new Date(bLast.createdAt).getTime() - new Date(aLast.createdAt).getTime();
 				});
 				break;
 			case 'least-recent':
@@ -62,7 +62,7 @@
 					const bLast = lastEntry(b.id);
 					if (!aLast) return 1;
 					if (!bLast) return -1;
-					return new Date(aLast.date).getTime() - new Date(bLast.date).getTime();
+					return new Date(aLast.createdAt).getTime() - new Date(bLast.createdAt).getTime();
 				});
 				break;
 			case 'not-evaluated':
@@ -88,7 +88,9 @@
 	function lastEntry(employeeId: number): PerformanceEntry | undefined {
 		const entries = performanceEntries.filter((e) => e.employeeId === employeeId);
 		if (entries.length === 0) return undefined;
-		return entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+		return entries.sort(
+			(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+		)[0];
 	}
 
 	function avgRating(employeeId: number): number {
@@ -110,8 +112,8 @@
 </script>
 
 <svelte:head>
-	<title>Svelte Tailwind Template</title>
-	<meta name="description" content="Svelte Tailwind Template" />
+	<title>EPT</title>
+	<meta name="description" content="Employee Performance Tracker" />
 </svelte:head>
 
 <section>
@@ -119,7 +121,7 @@
 		<h1
 			class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-fuchsia-400 to-violet-400 inline-block text-transparent bg-clip-text mb-4"
 		>
-			Employee Performance Tracker
+			EPT
 		</h1>
 		<p class="text-lg text-gray-600 mb-8">
 			A simple tool to track employee performance and streamline evaluations.

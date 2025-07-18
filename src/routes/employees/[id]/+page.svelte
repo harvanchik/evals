@@ -113,6 +113,20 @@
 			const index = allEntries.findIndex((e) => e.id === editingEntry!.id);
 			if (index !== -1) {
 				const originalEntry = allEntries[index];
+
+				const tagsChanged =
+					JSON.stringify(originalEntry.tagIds?.sort()) !==
+					JSON.stringify(editingEntry.tagIds?.sort());
+
+				if (
+					originalEntry.description === editingEntry.description &&
+					originalEntry.rating === editingEntry.rating &&
+					!tagsChanged
+				) {
+					editingEntry = null;
+					return;
+				}
+
 				const updatedEntry: PerformanceEntry = {
 					...editingEntry,
 					updatedAt: new Date().toISOString(),
