@@ -7,6 +7,6 @@
 
 <Header />
 
-<main class="container mx-auto p-4">
+<main class="container mx-auto p-4 pb-20 md:pb-4">
 	{@render children()}
 </main>
