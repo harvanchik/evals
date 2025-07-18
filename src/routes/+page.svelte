@@ -5,7 +5,9 @@
 		getEmployees,
 		getPerformanceEntries,
 		getJobTitles,
-		getTags
+		getTags,
+		saveEmployees,
+		savePerformanceEntries
 	} from '$lib/utils/localStorage';
 	import type { Employee, PerformanceEntry, JobTitle, Tag } from '$lib/types';
 	import SummaryCard from '$lib/components/SummaryCard.svelte';
@@ -18,9 +20,6 @@
 	let sortOption = $state(localStorage.getItem('sortOption') || 'recent');
 	let filterJobTitle = $state(localStorage.getItem('filterJobTitle') || 'all');
 	let search = $state('');
-	let success = $state('');
-	let editingEntry: PerformanceEntry | null = $state(null);
-	let expandedHistory: { [key: number]: boolean } = $state({});
 
 	onMount(() => {
 		initializeMockData();
@@ -51,7 +50,7 @@
 	});
 
 	function applyFiltersAndSorting() {
-		let tempEmployees = employees;
+		let tempEmployees = employees.filter((e) => !e.archived);
 
 		if (filterJobTitle !== 'all') {
 			tempEmployees = tempEmployees.filter((e) => e.jobTitle === filterJobTitle);
