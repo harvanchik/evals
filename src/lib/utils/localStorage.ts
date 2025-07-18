@@ -67,7 +67,8 @@ export function initializeMockData() {
 			{
 				id: 1,
 				employeeId: 1,
-				date: new Date().toISOString(),
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 				description: 'Completed the new feature ahead of schedule.',
 				rating: 5
 			}

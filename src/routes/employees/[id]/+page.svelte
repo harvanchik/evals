@@ -21,6 +21,8 @@
 	let selectedTagIds = $state<number[]>([]);
 	let error = $state('');
 	let success = $state('');
+	let editingEntry: PerformanceEntry | null = $state(null);
+	let expandedHistory: { [key: number]: boolean } = $state({});
 
 	onMount(() => {
 		const employeeId = parseInt(page.url.pathname.split('/').pop() || '', 10);
@@ -78,7 +80,8 @@
 			const newEntry: PerformanceEntry = {
 				id: Date.now(),
 				employeeId: employee.id,
-				date: new Date().toISOString(),
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 				description,
 				rating,
 				tagIds: selectedTagIds
@@ -93,6 +96,48 @@
 			selectedTagIds = [];
 			error = '';
 		}
+	}
+
+	function startEditing(entry: PerformanceEntry) {
+		editingEntry = { ...entry, tagIds: [...(entry.tagIds || [])] };
+	}
+
+	function cancelEditing() {
+		editingEntry = null;
+	}
+
+	function updateEntry(event: Event) {
+		event.preventDefault();
+		if (editingEntry) {
+			const allEntries = getPerformanceEntries();
+			const index = allEntries.findIndex((e) => e.id === editingEntry!.id);
+			if (index !== -1) {
+				const originalEntry = allEntries[index];
+				const updatedEntry: PerformanceEntry = {
+					...editingEntry,
+					updatedAt: new Date().toISOString(),
+					history: [
+						...(originalEntry.history || []),
+						{
+							description: originalEntry.description,
+							rating: originalEntry.rating,
+							tagIds: originalEntry.tagIds,
+							updatedAt: originalEntry.updatedAt
+						}
+					]
+				};
+				allEntries[index] = updatedEntry;
+				savePerformanceEntries(allEntries);
+				performanceEntries = performanceEntries.map((e) =>
+					e.id === updatedEntry.id ? updatedEntry : e
+				);
+				editingEntry = null;
+			}
+		}
+	}
+
+	function toggleHistory(entryId: number) {
+		expandedHistory[entryId] = !expandedHistory[entryId];
 	}
 
 	function archiveEmployee() {
@@ -149,20 +194,128 @@
 			<ul class="space-y-4 mt-4">
 				{#each performanceEntries as entry}
 					<li class="p-4 bg-gray-50 rounded-md">
-						<div class="flex space-x-2 mb-2">
-							{#each entry.tagIds || [] as tagId}
-								<span
-									class="px-2 py-1 bg-gray-200 text-gray-800 text-xs font-semibold rounded-full"
+						{#if editingEntry && editingEntry.id === entry.id}
+							<form onsubmit={updateEntry} class="space-y-4">
+								<label class="block">
+									<span class="text-gray-700">Description</span>
+									<textarea
+										bind:value={editingEntry.description}
+										class="w-full p-2 border rounded"
+										required
+									></textarea>
+								</label>
+								<label class="block">
+									<span class="text-gray-700">Rating (0-5)</span>
+									<input
+										type="number"
+										bind:value={editingEntry.rating}
+										min="0"
+										max="5"
+										class="w-full p-2 border rounded"
+										required
+									/>
+								</label>
+								<label class="block">
+									<span class="text-gray-700">Tags</span>
+									<div class="flex flex-wrap gap-2 mt-2">
+										{#each allTags as tag}
+											<button
+												type="button"
+												onclick={() => {
+													if (editingEntry!.tagIds!.includes(tag.id)) {
+														editingEntry!.tagIds = editingEntry!.tagIds!.filter(
+															(id) => id !== tag.id
+														);
+													} else {
+														editingEntry!.tagIds!.push(tag.id);
+													}
+												}}
+												class="px-3 py-1 text-sm rounded-full {editingEntry!.tagIds!.includes(
+													tag.id
+												)
+													? 'bg-blue-500 text-white'
+													: 'bg-gray-200 text-gray-800'}"
+											>
+												{tag.name}
+											</button>
+										{/each}
+									</div>
+								</label>
+								<button
+									type="submit"
+									class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Save</button
 								>
-									{allTags.find((t) => t.id === tagId)?.name}
-								</span>
-							{/each}
-						</div>
-						<p class="text-gray-800">{entry.description}</p>
-						<div class="flex justify-between items-center mt-2">
-							<span class="text-sm text-gray-500">{formatTimestamp(entry.date)}</span>
-							<span class="font-bold text-blue-500">Rating: {entry.rating}/5</span>
-						</div>
+								<button
+									type="button"
+									onclick={cancelEditing}
+									class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-2"
+									>Cancel</button
+								>
+							</form>
+						{:else}
+							<div class="flex space-x-2 mb-2">
+								{#each entry.tagIds || [] as tagId}
+									<span
+										class="px-2 py-1 bg-gray-200 text-gray-800 text-xs font-semibold rounded-full"
+									>
+										{allTags.find((t) => t.id === tagId)?.name}
+									</span>
+								{/each}
+							</div>
+							<p class="text-gray-800">{entry.description}</p>
+							<div class="flex justify-between items-center mt-2">
+								<div class="text-sm text-gray-500">
+									<div>Created: {formatTimestamp(entry.createdAt)}</div>
+									{#if entry.createdAt !== entry.updatedAt}
+										<div>Updated: {formatTimestamp(entry.updatedAt)}</div>
+									{/if}
+								</div>
+								<span class="font-bold text-blue-500">Rating: {entry.rating}/5</span>
+							</div>
+							<div class="mt-2">
+								<button
+									onclick={() => startEditing(entry)}
+									class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+									>Edit</button
+								>
+								{#if entry.history && entry.history.length > 0}
+									<button
+										onclick={() => toggleHistory(entry.id)}
+										class="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-xs ml-2"
+										>View History</button
+									>
+								{/if}
+							</div>
+							{#if expandedHistory[entry.id]}
+								<div class="mt-4 p-2 bg-gray-100 rounded">
+									<h4 class="font-bold text-sm">History</h4>
+									<ul class="space-y-2 mt-2">
+										{#each entry.history!.slice().reverse() as pastEntry, i}
+											<li class="p-2 bg-white rounded shadow-sm">
+												<div class="flex space-x-2 mb-2">
+													{#each pastEntry.tagIds || [] as tagId}
+														<span
+															class="px-2 py-1 bg-gray-200 text-gray-800 text-xs font-semibold rounded-full"
+														>
+															{allTags.find((t) => t.id === tagId)?.name}
+														</span>
+													{/each}
+												</div>
+												<p class="text-gray-800">{pastEntry.description}</p>
+												<div class="flex justify-between items-center mt-2">
+													<span class="text-xs text-gray-500"
+														>Updated: {formatTimestamp(pastEntry.updatedAt)}</span
+													>
+													<span class="font-bold text-blue-500 text-xs"
+														>Rating: {pastEntry.rating}/5</span
+													>
+												</div>
+											</li>
+										{/each}
+									</ul>
+								</div>
+							{/if}
+						{/if}
 					</li>
 				{/each}
 			</ul>

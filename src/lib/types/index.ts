@@ -10,10 +10,17 @@ export interface Employee {
 export interface PerformanceEntry {
 	id: number;
 	employeeId: number;
-	date: string;
+	createdAt: string;
+	updatedAt: string;
 	description: string;
 	rating: number;
 	tagIds?: number[];
+	history?: {
+		description: string;
+		rating: number;
+		tagIds?: number[];
+		updatedAt: string;
+	}[];
 }
 
 export interface JobTitle {
