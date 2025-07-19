@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const tags = await xata.db.tags.filter({ user: locals.user.username }).getAll();
 
-	return { employee, entries, tags: tags.map((t) => t.name).filter(Boolean) as string[] };
+	return { employee, entries, tags: tags.toSerializable() };
 };
 
 export const actions: Actions = {
@@ -40,14 +40,14 @@ export const actions: Actions = {
 
 		const formData = await request.formData();
 		const note = formData.get('note') as string;
-		const rating = Number(formData.get('rating'));
+		const rating = parseFloat(formData.get('rating') as string);
 		const tags = formData.getAll('tags') as string[];
 
 		if (!note || note.trim().length === 0) {
 			return fail(400, { note, missing: true });
 		}
 
-		if (isNaN(rating) || rating < 1 || rating > 5) {
+		if (isNaN(rating) || rating < 0 || rating > 5) {
 			return fail(400, { rating, invalid: true });
 		}
 

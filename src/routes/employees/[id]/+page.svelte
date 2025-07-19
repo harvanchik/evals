@@ -2,23 +2,36 @@
 	import type { PageProps } from './$types';
 	import { enhance } from '$app/forms';
 	import Spinner from '$lib/components/Spinner.svelte';
+	import StarRating from '$lib/components/StarRating.svelte';
+	import { darkenColor, hexToRgb } from '$lib/utils/colors';
 
 	let { data, form }: PageProps = $props();
-	let { employee, tags } = data;
+	let { employee, tags: rawTags } = data;
 	let entries = $state(
 		data.entries && typeof data.entries.toSerializable === 'function'
 			? data.entries.toSerializable()
 			: data.entries || []
 	);
+	let tags = $derived((Array.isArray(rawTags) ? rawTags : []).filter((t) => t && t.name));
+	let hoveredTag = $state<string | null>(null);
 
 	let loading = $state(false);
 	let showForm = $state(false);
 
 	let newEntry = $state({
 		note: '',
-		rating: 3,
+		rating: 2.5,
 		tags: [] as string[]
 	});
+
+	function toggleTag(tagName: string) {
+		const index = newEntry.tags.indexOf(tagName);
+		if (index > -1) {
+			newEntry.tags.splice(index, 1);
+		} else {
+			newEntry.tags.push(tagName);
+		}
+	}
 
 	const avgRating = $derived(
 		entries.length > 0
@@ -91,8 +104,9 @@
 									}
 								} as any);
 
+								// Reset form state
 								showForm = false;
-								newEntry = { note: '', rating: 3, tags: [] };
+								newEntry = { note: '', rating: 2.5, tags: [] };
 							}
 							loading = false;
 						};
@@ -114,40 +128,33 @@
 						{/if}
 					</div>
 					<div class="mb-4">
-						<label for="rating" class="block text-sm font-medium text-gray-700"
-							>Rating: {newEntry.rating}/5</label
-						>
-						<input
-							id="rating"
-							name="rating"
-							type="range"
-							min="1"
-							max="5"
-							step="1"
-							bind:value={newEntry.rating}
-							class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-						/>
+						<input type="hidden" name="rating" value={newEntry.rating} />
+						<StarRating bind:rating={newEntry.rating} />
 					</div>
 					<fieldset class="mb-4">
-						<legend class="block text-sm font-medium text-gray-700">Tags</legend>
-						<div
-							class="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2"
-							role="group"
-							aria-labelledby="tags-label"
-						>
-							{#each tags as tag}
-								<label class="flex items-center space-x-2">
-									<input
-										type="checkbox"
-										name="tags"
-										value={tag}
-										bind:group={newEntry.tags}
-										class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-									/>
-									<span>{tag}</span>
-								</label>
+						<legend class="block text-sm font-medium text-gray-700 mb-2">Tags</legend>
+						<div class="flex flex-wrap gap-2">
+							{#each tags as tag (tag.id)}
+								{@const isSelected = newEntry.tags.includes(tag.name!)}
+								{@const rgbColor = hexToRgb(typeof tag.color === 'string' ? tag.color : '')}
+								<button
+									type="button"
+									onclick={() => toggleTag(tag.name!)}
+									class="cursor-pointer px-3 py-1.5 text-sm font-semibold rounded-md transition-all duration-200"
+									class:selected={isSelected}
+									style="--tag-color: {rgbColor}; --tag-color-dark: {darkenColor(
+										typeof tag.color === 'string' ? tag.color : '#e5e7eb',
+										40
+									)};"
+								>
+									{tag.name}
+								</button>
 							{/each}
 						</div>
+						<!-- Hidden inputs for form submission -->
+						{#each newEntry.tags as selectedTag}
+							<input type="hidden" name="tags" value={selectedTag} />
+						{/each}
 					</fieldset>
 					<button
 						type="submit"
@@ -173,8 +180,8 @@
 			<div class="space-y-4">
 				{#if entries.length > 0}
 					{#each entries as entry (entry.id)}
-						<div class="bg-white p-4 rounded-lg shadow-md border-l-4" style:border-color="">
-							<div class="flex justify-between items-start">
+						<div class="bg-white p-4 rounded-lg shadow-md">
+							<div class="flex justify-between items-start mb-2">
 								<p class="text-gray-800 flex-1">{entry.note}</p>
 								<div class="flex items-center space-x-2 ml-4">
 									<span class="text-lg font-bold text-blue-600"
@@ -184,13 +191,23 @@
 								</div>
 							</div>
 							{#if Array.isArray(entry.tags) && entry.tags.length > 0}
-								<div class="mt-2 flex flex-wrap gap-2">
-									{#each entry.tags as tag}
-										<span
-											class="px-2 py-1 text-xs font-semibold text-white rounded-full bg-gray-400"
-										>
-											{tag}
-										</span>
+								<div class="flex flex-wrap gap-2">
+									{#each entry.tags as tagString}
+										{@const tagObject = tags.find((t) => t.name === tagString)}
+										{#if tagObject}
+											{@const rgbColor = hexToRgb(
+												typeof tagObject.color === 'string' ? tagObject.color : ''
+											)}
+											<span
+												class="px-2 py-1 text-xs font-semibold rounded-md"
+												style="--tag-color: {rgbColor}; --tag-color-dark: {darkenColor(
+													typeof tagObject.color === 'string' ? tagObject.color : '#e5e7eb',
+													40
+												)};"
+											>
+												{tagString}
+											</span>
+										{/if}
 									{/each}
 								</div>
 							{/if}
@@ -205,3 +222,34 @@
 {:else}
 	<p class="p-4">Employee not found.</p>
 {/if}
+
+<style>
+	/* Default state for unselected tag buttons */
+	button[style*='--tag-color'] {
+		background-color: rgba(var(--tag-color), 0.2);
+		color: var(--tag-color-dark);
+		border: 1px solid rgba(var(--tag-color), 0.3);
+	}
+
+	/* Unselected tag buttons on hover */
+	button[style*='--tag-color']:hover:not(.selected) {
+		background-color: rgba(var(--tag-color), 0.8);
+		color: var(--tag-color-dark);
+	}
+
+	/* Selected tag buttons */
+	button[style*='--tag-color'].selected {
+		background-color: rgba(var(--tag-color), 0.8);
+		color: var(--tag-color-dark);
+		/* Using box-shadow for a border that doesn't affect layout */
+		box-shadow: 0 0 0 2px var(--tag-color-dark);
+		border-color: transparent; /* Hides the base border to avoid a double border */
+	}
+
+	/* Tag spans (for display only) - make them look bright */
+	span[style*='--tag-color'] {
+		background-color: rgba(var(--tag-color), 0.8);
+		color: var(--tag-color-dark);
+		border: 1px solid transparent;
+	}
+</style>
