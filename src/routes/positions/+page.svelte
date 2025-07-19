@@ -9,6 +9,7 @@
 
 	let { data, form }: PageProps = $props();
 	let positions = $derived(data.positions || []);
+	let search = $state('');
 
 	let editingPositionId = $state<string | null>(null);
 	let newPosition = $state({
@@ -26,13 +27,24 @@
 
 	function startEditing(position: (typeof positions)[0]) {
 		editingPositionId = position.id;
-		newPosition.title = position.title;
-		newPosition.description = position.description || '';
-		newPosition.color = position.color || '#cccccc';
+		newPosition.title = typeof position.title === 'string' ? position.title : '';
+		newPosition.description = typeof position.description === 'string' ? position.description : '';
+		newPosition.color = typeof position.color === 'string' ? position.color : '#cccccc';
 	}
 
+	let filteredPositions = $derived(
+		positions.filter((pos) => {
+			const title = typeof pos.title === 'string' ? pos.title : '';
+			const description = typeof pos.description === 'string' ? pos.description : '';
+			const searchTerm = search.toLowerCase();
+			return (
+				title.toLowerCase().includes(searchTerm) || description.toLowerCase().includes(searchTerm)
+			);
+		})
+	);
+
 	$effect(() => {
-		if (positions && typeof lucide !== 'undefined') {
+		if (filteredPositions && typeof lucide !== 'undefined') {
 			lucide.createIcons();
 		}
 	});
@@ -105,49 +117,61 @@
 			</form>
 		</div>
 		<div>
-			<h2 class="text-xl font-semibold text-gray-700 mb-2">Existing Positions</h2>
-			<ul class="space-y-2">
-				{#each positions as position (position.id)}
-					<li
-						class="p-4 rounded-lg shadow flex justify-between items-center"
-						style:border-left="4px solid {position.color || '#cccccc'}"
-					>
-						<div>
-							<p class="font-bold">{position.title}</p>
-							<p class="text-sm text-gray-600">{position.description}</p>
-						</div>
-						<div class="flex space-x-2">
-							<button
-								onclick={() => startEditing(position)}
-								class="text-gray-500 hover:text-blue-600"
-								aria-label="Edit position"
-							>
-								<i data-lucide="pencil" class="w-4 h-4"></i>
-							</button>
-							<form
-								method="POST"
-								action="?/deletePosition&id={position.id}"
-								use:enhance={({ cancel }) => {
-									if (!confirm('Are you sure you want to delete this position?')) {
-										cancel();
-									}
-									return async ({ update }) => {
-										await update({ reset: false });
-									};
-								}}
-							>
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-700">Existing Positions</h2>
+				<input
+					type="text"
+					bind:value={search}
+					placeholder="Search positions..."
+					class="w-1/2 p-2 border rounded"
+				/>
+			</div>
+			{#if filteredPositions.length}
+				<ul class="space-y-2">
+					{#each filteredPositions as position (position.id)}
+						<li
+							class="p-4 rounded-lg shadow flex justify-between items-center"
+							style:border-left="4px solid {position.color || '#cccccc'}"
+						>
+							<div>
+								<p class="font-bold">{position.title}</p>
+								<p class="text-sm text-gray-600">{position.description}</p>
+							</div>
+							<div class="flex items-center space-x-2">
 								<button
-									type="submit"
-									class="text-gray-500 hover:text-red-600"
-									aria-label="Delete position"
+									onclick={() => startEditing(position)}
+									class="text-gray-500 hover:text-blue-600"
+									aria-label="Edit position"
 								>
-									<i data-lucide="trash-2" class="w-4 h-4"></i>
+									<i data-lucide="pencil" class="w-5 h-5"></i>
 								</button>
-							</form>
-						</div>
-					</li>
-				{/each}
-			</ul>
+								<form
+									method="POST"
+									action="?/deletePosition&id={position.id}"
+									use:enhance={({ cancel }) => {
+										if (!confirm('Are you sure you want to delete this position?')) {
+											cancel();
+										}
+										return async ({ update }) => {
+											await update({ reset: false });
+										};
+									}}
+								>
+									<button
+										type="submit"
+										class="text-gray-500 hover:text-red-600"
+										aria-label="Delete position"
+									>
+										<i data-lucide="trash-2" class="w-5 h-5"></i>
+									</button>
+								</form>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p>No positions found.</p>
+			{/if}
 		</div>
 	</div>
 </div>
