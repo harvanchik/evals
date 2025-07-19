@@ -4,7 +4,9 @@
 		"jsxImportSource": "preact"
 	},
 	"imports": {
-		"@xata.io/client": "npm:@xata.io/client@latest"
+		"@xata.io/client": "npm:@xata.io/client@latest",
+		"https://deno.land/std@0.224.0/": "https://deno.land/std@0.224.0/",
+		"https://deno.land/x/lume@v2.2.1/": "https://deno.land/x/lume@v2.2.1/"
 	},
 	"nodeModulesDir": "auto"
 }
