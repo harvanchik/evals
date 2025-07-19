@@ -10,7 +10,7 @@
 		<div class="hidden md:flex space-x-4 items-center">
 			<a href="/" class="hover:underline">Home</a>
 			<a href="/employees" class="hover:underline">Employees</a>
-			<a href="/jobtitles" class="hover:underline">Job Titles</a>
+			<a href="/positions" class="hover:underline">Positions</a>
 			<a href="/tags" class="hover:underline">Tags</a>
 			<form action="/logout" method="POST">
 				<button type="submit" class="hover:underline">Logout</button>

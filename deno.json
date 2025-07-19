@@ -6,5 +6,5 @@
 	"imports": {
 		"@xata.io/client": "npm:@xata.io/client@latest"
 	},
-	"nodeModulesDir": true
+	"nodeModulesDir": "auto"
 }
