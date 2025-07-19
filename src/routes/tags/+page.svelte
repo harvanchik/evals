@@ -129,7 +129,7 @@
 								<p class="font-bold">{tag.name}</p>
 								<p class="text-sm text-gray-600">{tag.description}</p>
 							</div>
-							<div class="flex items-center space-x-2">
+							<div class="flex items-center space-x-3">
 								<button
 									onclick={() => startEditing(tag)}
 									class="text-gray-500 hover:text-blue-600"
@@ -138,6 +138,7 @@
 									<i data-lucide="pencil" class="w-5 h-5"></i>
 								</button>
 								<form
+									class="items-center flex"
 									method="POST"
 									action="?/deleteTag&id={tag.id}"
 									use:enhance={({ cancel }) => {

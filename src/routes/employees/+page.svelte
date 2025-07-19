@@ -179,13 +179,13 @@
 									<p class="text-sm text-gray-600">{employee.position}</p>
 								</div>
 							</a>
-							<div class="flex space-x-3">
+							<div class="flex items-center space-x-3">
 								<button
 									onclick={() => startEditing(employee)}
 									class="text-gray-500 hover:text-blue-600"
 									aria-label="Edit employee"
 								>
-									<i data-lucide="pencil" class="w-4 h-4"></i>
+									<i data-lucide="pencil" class="w-5 h-5"></i>
 								</button>
 								<form
 									class="items-center flex"
@@ -205,7 +205,7 @@
 										class="text-gray-500 hover:text-yellow-600"
 										aria-label="Archive employee"
 									>
-										<i data-lucide="archive" class="w-4 h-4"></i>
+										<i data-lucide="archive" class="w-5 h-5"></i>
 									</button>
 								</form>
 							</div>
