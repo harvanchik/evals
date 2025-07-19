@@ -33,6 +33,16 @@
 		}
 	}
 
+	function toggleForm() {
+		showForm = !showForm;
+		if (!showForm) {
+			// Reset the form when closing
+			newEntry.note = '';
+			newEntry.rating = 2.5;
+			newEntry.tags = [];
+		}
+	}
+
 	const avgRating = $derived(
 		entries.length > 0
 			? entries.reduce(
@@ -79,7 +89,7 @@
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-2xl font-bold text-gray-800">Performance Entries</h2>
 				<button
-					onclick={() => (showForm = !showForm)}
+					onclick={toggleForm}
 					class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
 				>
 					{showForm ? 'Cancel' : 'Add Entry'}
@@ -156,17 +166,26 @@
 							<input type="hidden" name="tags" value={selectedTag} />
 						{/each}
 					</fieldset>
-					<button
-						type="submit"
-						class="w-36 h-10 flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer disabled:cursor-not-allowed"
-						disabled={loading}
-					>
-						{#if loading}
-							<Spinner />
-						{:else}
-							Save Entry
-						{/if}
-					</button>
+					<div class="flex justify-end space-x-2">
+						<button
+							type="submit"
+							class="w-36 h-10 flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer disabled:cursor-not-allowed"
+							disabled={loading}
+						>
+							{#if loading}
+								<Spinner />
+							{:else}
+								Save Entry
+							{/if}
+						</button>
+						<button
+							type="button"
+							onclick={toggleForm}
+							class="text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200 ml-2"
+						>
+							Cancel
+						</button>
+					</div>
 				</form>
 			{/if}
 
