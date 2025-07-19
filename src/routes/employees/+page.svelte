@@ -33,7 +33,7 @@
 	}
 
 	$effect(() => {
-		if (employees && typeof lucide !== 'undefined') {
+		if (filteredEmployees && typeof lucide !== 'undefined') {
 			lucide.createIcons();
 		}
 	});
