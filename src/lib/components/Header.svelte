@@ -25,7 +25,7 @@
 	<div class="flex justify-around items-center h-16">
 		<a href="/" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Home</a>
 		<a href="/employees" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Employees</a>
-		<a href="/jobtitles" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Job Titles</a>
+		<a href="/positions" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Positions</a>
 		<a href="/tags" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Tags</a>
 		<form action="/logout" method="POST">
 			<button type="submit" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
