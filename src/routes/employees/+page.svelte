@@ -152,15 +152,15 @@
 			</form>
 		</div>
 		<div>
-			<div class="mb-4">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-700">Employees</h2>
 				<input
 					type="text"
 					bind:value={search}
-					placeholder="Search active employees..."
-					class="w-full p-2 border rounded"
+					placeholder="Search employees..."
+					class="w-1/2 p-2 border rounded"
 				/>
 			</div>
-			<h2 class="text-xl font-semibold text-gray-700 mb-2">Existing Employees</h2>
 			{#if filteredEmployees.length}
 				<ul class="space-y-2">
 					{#each filteredEmployees as employee (employee.id)}
