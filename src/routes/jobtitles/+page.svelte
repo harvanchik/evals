@@ -1,79 +1,148 @@
+<script context="module">
+	declare const lucide: any;
+</script>
+
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { enhance } from '$app/forms';
 	import ColorInput from '$lib/components/ColorInput.svelte';
 
 	let { data, form }: PageProps = $props();
-
 	let positions = $derived(data.positions || []);
-	let color = $state('#000000');
+
+	let editingPositionId = $state<string | null>(null);
+	let newPosition = $state({
+		title: '',
+		description: '',
+		color: '#cccccc'
+	});
+
+	function handleReset() {
+		newPosition.title = '';
+		newPosition.description = '';
+		newPosition.color = '#cccccc';
+		editingPositionId = null;
+	}
+
+	function startEditing(position: (typeof positions)[0]) {
+		editingPositionId = position.id;
+		newPosition.title = position.title;
+		newPosition.description = position.description || '';
+		newPosition.color = position.color || '#cccccc';
+	}
+
+	$effect(() => {
+		if (positions && typeof lucide !== 'undefined') {
+			lucide.createIcons();
+		}
+	});
 </script>
 
+<svelte:head>
+	<title>Positions</title>
+</svelte:head>
+
 <div class="p-4">
-	<h1 class="text-2xl font-bold text-gray-800">Job Titles</h1>
-	<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
-		<div class="md:col-span-2">
-			<h2 class="text-xl font-semibold text-gray-700">Existing Titles</h2>
-			{#if positions.length}
-				<ul class="space-y-2 mt-2">
-					{#each positions as position (position.id)}
-						<li class="p-4 bg-white rounded-md shadow flex items-center">
-							<div
-								class="w-4 h-4 rounded-full mr-4"
-								style:background-color={position.color || '#ccc'}
-							></div>
-							<div class="flex-grow">
-								<div class="font-bold text-gray-800">{position.title}</div>
-								<div class="text-sm text-gray-600">{position.description}</div>
-							</div>
-						</li>
-					{/each}
-				</ul>
-			{:else}
-				<p>No job titles found.</p>
-			{/if}
-		</div>
+	<h1 class="text-2xl font-bold text-gray-800">Positions</h1>
+
+	<div class="grid md:grid-cols-2 gap-8 mt-4">
 		<div>
-			<h2 class="text-xl font-semibold text-gray-700">Add New Title</h2>
-			<form method="POST" class="p-4 bg-white rounded-md shadow mt-2">
-				<div class="mb-4">
-					<label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+			<h2 class="text-xl font-semibold text-gray-700 mb-2">
+				{#if editingPositionId}Edit Position{:else}Add New Position{/if}
+			</h2>
+			<form
+				method="POST"
+				action={editingPositionId ? `?/updatePosition&id=${editingPositionId}` : '?/createPosition'}
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						if (result.type === 'success') {
+							handleReset();
+						}
+						await update({ reset: false });
+					};
+				}}
+				class="space-y-4 p-4 border rounded"
+			>
+				<label class="block">
+					<span class="text-gray-700">Title</span>
 					<input
 						type="text"
-						id="title"
 						name="title"
-						class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+						bind:value={newPosition.title}
+						class="w-full p-2 border rounded"
 						required
 					/>
-				</div>
-				<div class="mb-4">
-					<label for="description" class="block text-sm font-medium text-gray-700"
-						>Description</label
-					>
+				</label>
+				<label class="block">
+					<span class="text-gray-700">Description (Optional)</span>
 					<textarea
-						id="description"
 						name="description"
+						bind:value={newPosition.description}
+						class="w-full p-2 border rounded"
 						rows="3"
-						class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 					></textarea>
+				</label>
+				<ColorInput bind:value={newPosition.color} />
+				<input type="hidden" name="color" value={newPosition.color} />
+
+				<div class="flex items-center space-x-2">
+					<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+						{#if editingPositionId}Save Changes{:else}Add Position{/if}
+					</button>
+					{#if editingPositionId}
+						<button
+							type="button"
+							onclick={handleReset}
+							class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+						>
+							Cancel
+						</button>
+					{/if}
 				</div>
-				<div class="mb-4">
-					<label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-					<ColorInput bind:value={color} />
-					<input type="hidden" name="color" value={color} />
-				</div>
-				<button
-					type="submit"
-					class="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-				>
-					Add Position
-				</button>
-				{#if form?.success}
-					<p class="text-green-500 text-sm mt-2">Position added successfully!</p>
-				{/if}
 				{#if form?.error}
-					<p class="text-red-500 text-sm mt-2">{form.error}</p>
+					<p class="text-red-500">{form.error}</p>
 				{/if}
 			</form>
+		</div>
+		<div>
+			<h2 class="text-xl font-semibold text-gray-700 mb-2">Existing Positions</h2>
+			<ul class="space-y-2">
+				{#each positions as position (position.id)}
+					<li
+						class="p-4 rounded-lg shadow flex justify-between items-center"
+						style:border-left="4px solid {position.color || '#cccccc'}"
+					>
+						<div>
+							<p class="font-bold">{position.title}</p>
+							<p class="text-sm text-gray-600">{position.description}</p>
+						</div>
+						<div class="flex space-x-2">
+							<button
+								onclick={() => startEditing(position)}
+								class="text-gray-500 hover:text-blue-600"
+							>
+								<i data-lucide="pencil" class="w-4 h-4"></i>
+							</button>
+							<form
+								method="POST"
+								action="?/deletePosition&id={position.id}"
+								use:enhance={({ cancel }) => {
+									if (!confirm('Are you sure you want to delete this position?')) {
+										cancel();
+									}
+									return async ({ update }) => {
+										await update({ reset: false });
+									};
+								}}
+							>
+								<button type="submit" class="text-gray-500 hover:text-red-600">
+									<i data-lucide="trash-2" class="w-4 h-4"></i>
+								</button>
+							</form>
+						</div>
+					</li>
+				{/each}
+			</ul>
 		</div>
 	</div>
 </div>
