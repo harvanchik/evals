@@ -8,7 +8,7 @@
 	<nav class="container mx-auto px-4 py-2 flex justify-between items-center">
 		<a href="/" class="text-xl font-bold">EPT</a>
 		<div class="hidden md:flex space-x-4 items-center">
-			<a href="/" class="hover:underline">Home</a>
+			<a href="/" class="hover:underline">Dashboard</a>
 			<a href="/employees" class="hover:underline">Employees</a>
 			<a href="/positions" class="hover:underline">Positions</a>
 			<a href="/tags" class="hover:underline">Tags</a>

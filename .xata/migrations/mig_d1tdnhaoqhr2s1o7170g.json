@@ -1,0 +1,21 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d1tdnhaoqhr2s1o7170g",
+    "operations": [
+      {
+        "drop_constraint": {
+          "up": "\"title\"",
+          "down": "\"title\"",
+          "name": "positions__pgroll_new_title_key",
+          "table": "positions"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d1tdnhaoqhr2s1o7170g",
+  "parent": "mig_d1td8nioqhr2s1o716s0",
+  "schema": "public",
+  "startedAt": "2025-07-18T23:41:58.53436Z"
+}

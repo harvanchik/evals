@@ -122,7 +122,22 @@ const tables = [
 				definition: 'CHECK ((length(xata_id) < 256))'
 			}
 		},
-		foreignKeys: {},
+		foreignKeys: {
+			employee_link: {
+				name: 'employee_link',
+				columns: ['employee'],
+				referencedTable: 'employees',
+				referencedColumns: ['xata_id'],
+				onDelete: 'SET NULL'
+			},
+			user_link: {
+				name: 'user_link',
+				columns: ['user'],
+				referencedTable: 'users',
+				referencedColumns: ['username'],
+				onDelete: 'SET NULL'
+			}
+		},
 		primaryKey: [],
 		uniqueConstraints: {
 			_pgroll_new_entries_xata_id_key: {
@@ -131,6 +146,157 @@ const tables = [
 			}
 		},
 		columns: [
+			{
+				name: 'employee',
+				type: 'link',
+				link: { table: 'employees' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"employees"}'
+			},
+			{
+				name: 'note',
+				type: 'text',
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'rating',
+				type: 'float',
+				notNull: false,
+				unique: false,
+				defaultValue: "'0'::double precision",
+				comment: ''
+			},
+			{
+				name: 'tags',
+				type: 'multiple',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'user',
+				type: 'link',
+				link: { table: 'users' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"users"}'
+			},
+			{
+				name: 'xata_createdat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_id',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+				comment: ''
+			},
+			{
+				name: 'xata_updatedat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_version',
+				type: 'int',
+				notNull: true,
+				unique: false,
+				defaultValue: '0',
+				comment: ''
+			}
+		]
+	},
+	{
+		name: 'entry_history',
+		checkConstraints: {
+			entry_history_xata_id_length_xata_id: {
+				name: 'entry_history_xata_id_length_xata_id',
+				columns: ['xata_id'],
+				definition: 'CHECK ((length(xata_id) < 256))'
+			}
+		},
+		foreignKeys: {
+			entry_link: {
+				name: 'entry_link',
+				columns: ['entry'],
+				referencedTable: 'entries',
+				referencedColumns: ['xata_id'],
+				onDelete: 'SET NULL'
+			},
+			user_link: {
+				name: 'user_link',
+				columns: ['user'],
+				referencedTable: 'users',
+				referencedColumns: ['username'],
+				onDelete: 'SET NULL'
+			}
+		},
+		primaryKey: [],
+		uniqueConstraints: {
+			_pgroll_new_entry_history_xata_id_key: {
+				name: '_pgroll_new_entry_history_xata_id_key',
+				columns: ['xata_id']
+			}
+		},
+		columns: [
+			{
+				name: 'entry',
+				type: 'link',
+				link: { table: 'entries' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"entries"}'
+			},
+			{
+				name: 'note',
+				type: 'text',
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'rating',
+				type: 'float',
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'tags',
+				type: 'multiple',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'user',
+				type: 'link',
+				link: { table: 'users' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"users"}'
+			},
 			{
 				name: 'xata_createdat',
 				type: 'datetime',
@@ -188,10 +354,6 @@ const tables = [
 			_pgroll_new_positions_xata_id_key: {
 				name: '_pgroll_new_positions_xata_id_key',
 				columns: ['xata_id']
-			},
-			positions__pgroll_new_title_key: {
-				name: 'positions__pgroll_new_title_key',
-				columns: ['title']
 			}
 		},
 		columns: [
@@ -215,7 +377,7 @@ const tables = [
 				name: 'title',
 				type: 'text',
 				notNull: true,
-				unique: true,
+				unique: false,
 				defaultValue: null,
 				comment: ''
 			},
@@ -271,7 +433,15 @@ const tables = [
 				definition: 'CHECK ((length(xata_id) < 256))'
 			}
 		},
-		foreignKeys: {},
+		foreignKeys: {
+			user_link: {
+				name: 'user_link',
+				columns: ['user'],
+				referencedTable: 'users',
+				referencedColumns: ['username'],
+				onDelete: 'SET NULL'
+			}
+		},
 		primaryKey: [],
 		uniqueConstraints: {
 			_pgroll_new_tags_xata_id_key: {
@@ -280,6 +450,39 @@ const tables = [
 			}
 		},
 		columns: [
+			{
+				name: 'color',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'description',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'name',
+				type: 'text',
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'user',
+				type: 'link',
+				link: { table: 'users' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"users"}'
+			},
 			{
 				name: 'xata_createdat',
 				type: 'datetime',
@@ -397,6 +600,9 @@ export type EmployeesRecord = Employees & XataRecord;
 export type Entries = InferredTypes['entries'];
 export type EntriesRecord = Entries & XataRecord;
 
+export type EntryHistory = InferredTypes['entry_history'];
+export type EntryHistoryRecord = EntryHistory & XataRecord;
+
 export type Positions = InferredTypes['positions'];
 export type PositionsRecord = Positions & XataRecord;
 
@@ -409,6 +615,7 @@ export type UsersRecord = Users & XataRecord;
 export type DatabaseSchema = {
 	employees: EmployeesRecord;
 	entries: EntriesRecord;
+	entry_history: EntryHistoryRecord;
 	positions: PositionsRecord;
 	tags: TagsRecord;
 	users: UsersRecord;
