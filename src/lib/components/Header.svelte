@@ -1,7 +1,27 @@
 <script lang="ts">
 	import type { UsersRecord } from '../../xata';
+	import { onMount } from 'svelte';
 
 	let { user } = $props<{ user: UsersRecord }>();
+
+	onMount(() => {
+		const script = document.createElement('script');
+		script.src = 'https://unpkg.com/lucide@latest';
+		script.async = true;
+		script.defer = true;
+		script.onload = () => {
+			// @ts-expect-error - lucide is loaded from a script
+			if (typeof lucide !== 'undefined') {
+				// @ts-expect-error - lucide is loaded from a script
+				lucide.createIcons();
+			}
+		};
+		document.body.appendChild(script);
+
+		return () => {
+			document.body.removeChild(script);
+		};
+	});
 </script>
 
 <header class="bg-gray-100 text-gray-800 shadow-md">
@@ -23,14 +43,47 @@
 	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50"
 >
 	<div class="flex justify-around items-center h-16">
-		<a href="/" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Dashboard</a>
-		<a href="/employees" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Employees</a>
-		<a href="/positions" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Positions</a>
-		<a href="/tags" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Tags</a>
-		<form action="/logout" method="POST">
-			<button type="submit" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
-				>Logout</button
+		<a
+			href="/"
+			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			aria-label="Dashboard"
+		>
+			<i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+			<span class="text-xs mt-1">Dashboard</span>
+		</a>
+		<a
+			href="/employees"
+			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			aria-label="Employees"
+		>
+			<i data-lucide="users" class="w-5 h-5"></i>
+			<span class="text-xs mt-1">Employees</span>
+		</a>
+		<a
+			href="/positions"
+			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			aria-label="Positions"
+		>
+			<i data-lucide="briefcase" class="w-5 h-5"></i>
+			<span class="text-xs mt-1">Positions</span>
+		</a>
+		<a
+			href="/tags"
+			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			aria-label="Tags"
+		>
+			<i data-lucide="tags" class="w-5 h-5"></i>
+			<span class="text-xs mt-1">Tags</span>
+		</a>
+		<form action="/logout" method="POST" class="flex flex-col items-center">
+			<button
+				type="submit"
+				class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+				aria-label="Logout"
 			>
+				<i data-lucide="log-out" class="w-5 h-5"></i>
+				<span class="text-xs mt-1">Logout</span>
+			</button>
 		</form>
 	</div>
 </nav>

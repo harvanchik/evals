@@ -43,7 +43,7 @@
 	let positionColorMap = $derived(
 		(data.positions || []).reduce(
 			(acc, pos) => {
-				if (pos.title) {
+				if (pos.title && typeof pos.color === 'string') {
 					acc[pos.title] = pos.color;
 				}
 				return acc;
