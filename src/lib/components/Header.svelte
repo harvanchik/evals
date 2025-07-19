@@ -23,7 +23,7 @@
 	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50"
 >
 	<div class="flex justify-around items-center h-16">
-		<a href="/" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Home</a>
+		<a href="/" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Dashboard</a>
 		<a href="/employees" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Employees</a>
 		<a href="/positions" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Positions</a>
 		<a href="/tags" class="text-center hover:bg-gray-200 p-2 rounded-lg text-sm">Tags</a>
