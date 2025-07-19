@@ -5,26 +5,23 @@
 	let { data }: PageProps = $props();
 
 	let employees = $derived(data.employees || []);
-	let performanceEntries = $derived(data.performanceEntries || []);
 	let search = $state('');
 
+	let activeEmployees = $derived(employees.filter((emp) => emp.archived !== true));
+
 	let filteredEmployees = $derived(
-		employees.filter(
-			(emp) =>
-				(emp.first_name + ' ' + emp.last_name).toLowerCase().includes(search.toLowerCase()) ||
-				(emp.nickname || '').toLowerCase().includes(search.toLowerCase()) ||
-				(emp.position || '').toLowerCase().includes(search.toLowerCase())
-		)
+		activeEmployees.filter((emp) => {
+			const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase();
+			const nickname = (emp.nickname || '').toLowerCase();
+			const searchTerm = search.toLowerCase();
+			return fullName.includes(searchTerm) || nickname.includes(searchTerm);
+		})
 	);
 
-	const activeEmployees = $derived(employees.filter((e) => !e.archived));
-	const totalEntries = $derived(performanceEntries.length);
-	const averageRating = $derived(0); // Placeholder until entries are in Xata
-	const notEvaluatedCount = $derived(
-		activeEmployees.filter(
-			(emp) => !performanceEntries.some((entry) => entry.employeeId === emp.id)
-		).length
-	);
+	let totalEmployees = $derived(activeEmployees.length);
+	let totalEntries = $derived(0); // Placeholder
+	let avgRating = $derived(0); // Placeholder
+	let employeesNotEvaluated = $derived(activeEmployees.length); // Placeholder
 </script>
 
 <svelte:head>
@@ -34,10 +31,10 @@
 
 <section>
 	<div class="mb-8 grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
-		<SummaryCard title="Active Employees" value={activeEmployees.length} />
+		<SummaryCard title="Active Employees" value={totalEmployees} />
 		<SummaryCard title="Entries Written" value={totalEntries} />
-		<SummaryCard title="Average Rating" value={averageRating.toFixed(2)} />
-		<SummaryCard title="Not Evaluated" value={notEvaluatedCount} />
+		<SummaryCard title="Average Rating" value={avgRating.toFixed(2)} />
+		<SummaryCard title="Not Evaluated" value={employeesNotEvaluated} />
 	</div>
 
 	<div class="mb-4">
