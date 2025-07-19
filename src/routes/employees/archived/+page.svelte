@@ -91,7 +91,7 @@
 						>
 							<button
 								type="submit"
-								class="text-gray-500 hover:text-green-600"
+								class="text-gray-500 hover:text-green-600 cursor-pointer"
 								aria-label="Reinstate employee"
 							>
 								<i data-lucide="archive-restore" class="w-5 h-5"></i>

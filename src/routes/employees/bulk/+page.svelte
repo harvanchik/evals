@@ -49,7 +49,7 @@
 		</label>
 		<button
 			type="submit"
-			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-40 h-10 flex items-center justify-center"
+			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-40 h-10 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
 			disabled={loading}
 		>
 			{#if loading}

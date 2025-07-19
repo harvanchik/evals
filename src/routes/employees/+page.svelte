@@ -139,7 +139,7 @@
 				<div class="flex items-center justify-between space-x-2">
 					<button
 						type="submit"
-						class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-36 h-10 flex items-center justify-center"
+						class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-36 h-10 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
 						disabled={loading}
 					>
 						{#if loading}
@@ -157,7 +157,7 @@
 						<button
 							type="button"
 							onclick={handleReset}
-							class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+							class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 cursor-pointer"
 						>
 							Cancel
 						</button>
@@ -199,7 +199,7 @@
 							<div class="flex items-center space-x-3">
 								<button
 									onclick={() => startEditing(employee)}
-									class="text-gray-500 hover:text-blue-600"
+									class="text-gray-500 hover:text-blue-600 cursor-pointer"
 									aria-label="Edit employee"
 								>
 									<i data-lucide="pencil" class="w-5 h-5"></i>
@@ -221,7 +221,7 @@
 								>
 									<button
 										type="submit"
-										class="text-gray-500 hover:text-yellow-600"
+										class="text-gray-500 hover:text-yellow-600 cursor-pointer disabled:cursor-not-allowed"
 										aria-label="Archive employee"
 										disabled={loading}
 									>

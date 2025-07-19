@@ -13,7 +13,7 @@
 			<a href="/positions" class="hover:underline">Positions</a>
 			<a href="/tags" class="hover:underline">Tags</a>
 			<form action="/logout" method="POST">
-				<button type="submit" class="hover:underline">Logout</button>
+				<button type="submit" class="hover:underline cursor-pointer">Logout</button>
 			</form>
 		</div>
 	</nav>
