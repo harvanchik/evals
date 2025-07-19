@@ -18,6 +18,7 @@
 		})
 	);
 
+	// TODO: get total employees, total entries, average rating, and employees not evaluated
 	let totalEmployees = $derived(activeEmployees.length);
 	let totalEntries = $derived(0); // Placeholder
 	let avgRating = $derived(0); // Placeholder
