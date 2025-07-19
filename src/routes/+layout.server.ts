@@ -25,6 +25,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 			{ name: 'teamwork', color: '#A0C4FF', user: locals.user.username },
 			{ name: 'excellence', color: '#CAFFBF', user: locals.user.username },
 			{ name: 'adaptability', color: '#FFD6A5', user: locals.user.username },
+			{ name: 'mentorship', color: '#bdb2ff', user: locals.user.username },
 			{ name: 'communication', color: '#9BF6FF', user: locals.user.username },
 			{ name: 'respect', color: '#FFADAD', user: locals.user.username }
 		];
