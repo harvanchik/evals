@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
+	import Spinner from '$lib/components/Spinner.svelte';
 
 	let { data, form }: PageProps = $props();
 
 	let employees = $derived(data.employees || []);
 	let positions = $derived(data.positions || []);
 	let search = $state('');
+	let loading = $state(false);
 
 	let formState = $state({
 		id: null as string | null,
@@ -80,11 +82,13 @@
 				method="POST"
 				action={formState.id ? `?/updateEmployee&id=${formState.id}` : '?/createEmployee'}
 				use:enhance={() => {
+					loading = true;
 					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							handleReset();
 						}
 						await update({ reset: false });
+						loading = false;
 					};
 				}}
 				class="space-y-4 p-4 border rounded"
@@ -132,10 +136,23 @@
 						{/each}
 					</select>
 				</label>
-				<div class="flex items-center space-x-2">
-					<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-						{#if formState.id}Save Changes{:else}Add Employee{/if}
+				<div class="flex items-center justify-between space-x-2">
+					<button
+						type="submit"
+						class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-36 h-10 flex items-center justify-center"
+						disabled={loading}
+					>
+						{#if loading}
+							<Spinner />
+						{:else if formState.id}
+							Save Changes
+						{:else}
+							Add Employee
+						{/if}
 					</button>
+					{#if !formState.id}
+						<a href="/employees/bulk" class="text-blue-500 hover:underline ml-4">Bulk Add</a>
+					{/if}
 					{#if formState.id}
 						<button
 							type="button"
@@ -195,8 +212,10 @@
 										if (!confirm('Are you sure you want to archive this employee?')) {
 											cancel();
 										}
+										loading = true;
 										return async ({ update }) => {
 											await update({ reset: false });
+											loading = false;
 										};
 									}}
 								>
@@ -204,6 +223,7 @@
 										type="submit"
 										class="text-gray-500 hover:text-yellow-600"
 										aria-label="Archive employee"
+										disabled={loading}
 									>
 										<i data-lucide="archive" class="w-5 h-5"></i>
 									</button>
