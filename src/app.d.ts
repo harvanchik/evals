@@ -3,13 +3,12 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		interface Locals {
-			user: import('./xata').UsersRecord | null;
-		}
+		// interface Locals {}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
 	}
+	const lucide: any;
 }
 
 export {};

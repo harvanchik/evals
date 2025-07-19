@@ -1,4 +1,4 @@
-<script context="module">
+<script module lang="ts">
 	declare const lucide: any;
 </script>
 
@@ -120,6 +120,7 @@
 							<button
 								onclick={() => startEditing(position)}
 								class="text-gray-500 hover:text-blue-600"
+								aria-label="Edit position"
 							>
 								<i data-lucide="pencil" class="w-4 h-4"></i>
 							</button>
@@ -135,7 +136,11 @@
 									};
 								}}
 							>
-								<button type="submit" class="text-gray-500 hover:text-red-600">
+								<button
+									type="submit"
+									class="text-gray-500 hover:text-red-600"
+									aria-label="Delete position"
+								>
 									<i data-lucide="trash-2" class="w-4 h-4"></i>
 								</button>
 							</form>
