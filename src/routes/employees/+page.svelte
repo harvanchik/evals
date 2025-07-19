@@ -158,7 +158,7 @@
 					type="text"
 					bind:value={search}
 					placeholder="Search employees..."
-					class="w-1/2 p-2 border rounded"
+					class="w-full ml-5 p-2 border rounded"
 				/>
 			</div>
 			{#if filteredEmployees.length}

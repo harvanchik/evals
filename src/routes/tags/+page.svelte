@@ -1,103 +1,169 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { getTags, saveTags, initializeMockData } from '$lib/utils/localStorage';
-	import type { Tag } from '$lib/types';
+	import type { PageProps } from './$types';
+	import { enhance } from '$app/forms';
+	import ColorInput from '$lib/components/ColorInput.svelte';
 
-	let tags: Tag[] = $state([]);
-	let newTag = $state('');
-	let editingTag: Tag | null = $state(null);
+	let { data, form }: PageProps = $props();
+	let tags = $derived(data.tags || []);
+	let search = $state('');
 
-	onMount(() => {
-		initializeMockData();
-		tags = getTags();
+	let formState = $state({
+		id: null as string | null,
+		name: '',
+		description: '',
+		color: '#cccccc'
 	});
 
-	function addTag(event: Event) {
-		event.preventDefault();
-		if (newTag && !tags.find((t) => t.name === newTag)) {
-			const newId = tags.length > 0 ? Math.max(...tags.map((t) => t.id)) + 1 : 1;
-			tags.push({ id: newId, name: newTag });
-			saveTags(tags);
-			newTag = '';
+	function handleReset() {
+		formState.id = null;
+		formState.name = '';
+		formState.description = '';
+		formState.color = '#cccccc';
+	}
+
+	function startEditing(tag: (typeof tags)[0]) {
+		formState.id = tag.id;
+		formState.name = tag.name ?? '';
+		formState.description = tag.description ?? '';
+		formState.color = tag.color ?? '#cccccc';
+	}
+
+	$effect(() => {
+		if (filteredTags && typeof lucide !== 'undefined') {
+			lucide.createIcons();
 		}
-	}
+	});
 
-	function deleteTag(id: number) {
-		if (confirm('Are you sure you want to delete this tag?')) {
-			tags = tags.filter((t) => t.id !== id);
-			saveTags(tags);
-		}
-	}
-
-	function startEditing(tag: Tag) {
-		editingTag = { ...tag };
-	}
-
-	function cancelEditing() {
-		editingTag = null;
-	}
-
-	function updateTag(event: Event) {
-		event.preventDefault();
-		if (editingTag) {
-			const index = tags.findIndex((t) => t.id === editingTag!.id);
-			if (index !== -1) {
-				tags[index] = editingTag;
-				saveTags(tags);
-				editingTag = null;
-			}
-		}
-	}
+	let filteredTags = $derived(
+		tags.filter(
+			(tag) =>
+				(tag.name || '').toLowerCase().includes(search.toLowerCase()) ||
+				(tag.description || '').toLowerCase().includes(search.toLowerCase())
+		)
+	);
 </script>
+
+<svelte:head>
+	<title>Tags</title>
+</svelte:head>
 
 <div class="p-4">
 	<h1 class="text-2xl font-bold text-gray-800">Manage Tags</h1>
-	<form onsubmit={addTag} class="space-y-4 mt-4">
-		<label class="block">
-			<span class="text-gray-700">New Tag</span>
-			<input type="text" bind:value={newTag} class="w-full p-2 border rounded" required />
-		</label>
-		<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-			>Add Tag</button
-		>
-	</form>
-	<ul class="mt-4 space-y-2">
-		{#each tags as tag}
-			<li class="p-2 bg-gray-50 rounded">
-				{#if editingTag && editingTag.id === tag.id}
-					<form onsubmit={updateTag} class="space-y-4">
-						<input
-							type="text"
-							bind:value={editingTag.name}
-							class="w-full p-2 border rounded"
-							required
-						/>
-						<button
-							type="submit"
-							class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Save</button
-						>
+
+	<div class="grid md:grid-cols-2 gap-8 mt-4">
+		<div>
+			<h2 class="text-xl font-semibold text-gray-700 mb-2">
+				{#if formState.id}Edit Tag{:else}Add New Tag{/if}
+			</h2>
+			<form
+				method="POST"
+				action={formState.id ? `?/updateTag&id=${formState.id}` : '?/createTag'}
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						if (result.type === 'success') {
+							handleReset();
+						}
+						await update({ reset: false });
+					};
+				}}
+				class="space-y-4 p-4 border rounded"
+			>
+				<label class="block">
+					<span class="text-gray-700">Name</span>
+					<input
+						type="text"
+						name="name"
+						bind:value={formState.name}
+						class="w-full p-2 border rounded"
+						required
+					/>
+				</label>
+				<label class="block">
+					<span class="text-gray-700">Description (Optional)</span>
+					<textarea
+						name="description"
+						bind:value={formState.description}
+						class="w-full p-2 border rounded"
+						rows="3"
+					></textarea>
+				</label>
+				<ColorInput bind:value={formState.color} />
+				<input type="hidden" name="color" value={formState.color} />
+				<div class="flex items-center space-x-2">
+					<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+						{#if formState.id}Save Changes{:else}Add Tag{/if}
+					</button>
+					{#if formState.id}
 						<button
 							type="button"
-							onclick={cancelEditing}
-							class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-2">Cancel</button
+							onclick={handleReset}
+							class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
 						>
-					</form>
-				{:else}
-					<div class="flex justify-between items-center">
-						<span>{tag.name}</span>
-						<div>
-							<button
-								onclick={() => startEditing(tag)}
-								class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</button
-							>
-							<button
-								onclick={() => deleteTag(tag.id)}
-								class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 ml-2">Delete</button
-							>
-						</div>
-					</div>
+							Cancel
+						</button>
+					{/if}
+				</div>
+				{#if form?.error}
+					<p class="text-red-500">{form.error}</p>
 				{/if}
-			</li>
-		{/each}
-	</ul>
+			</form>
+		</div>
+		<div>
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-700">Tags</h2>
+				<input
+					type="text"
+					bind:value={search}
+					placeholder="Search tags..."
+					class="w-full ml-5 p-2 border rounded"
+				/>
+			</div>
+			{#if filteredTags.length}
+				<ul class="space-y-2">
+					{#each filteredTags as tag (tag.id)}
+						<li
+							class="p-4 rounded-lg shadow flex justify-between items-center"
+							style:border-left="4px solid {tag.color || '#cccccc'}"
+						>
+							<div>
+								<p class="font-bold">{tag.name}</p>
+								<p class="text-sm text-gray-600">{tag.description}</p>
+							</div>
+							<div class="flex items-center space-x-2">
+								<button
+									onclick={() => startEditing(tag)}
+									class="text-gray-500 hover:text-blue-600"
+									aria-label="Edit tag"
+								>
+									<i data-lucide="pencil" class="w-5 h-5"></i>
+								</button>
+								<form
+									method="POST"
+									action="?/deleteTag&id={tag.id}"
+									use:enhance={({ cancel }) => {
+										if (!confirm('Are you sure you want to delete this tag?')) {
+											cancel();
+										}
+										return async ({ update }) => {
+											await update({ reset: false });
+										};
+									}}
+								>
+									<button
+										type="submit"
+										class="text-gray-500 hover:text-red-600"
+										aria-label="Delete tag"
+									>
+										<i data-lucide="trash-2" class="w-5 h-5"></i>
+									</button>
+								</form>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p>No tags found.</p>
+			{/if}
+		</div>
+	</div>
 </div>
