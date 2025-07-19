@@ -179,7 +179,7 @@
 									<p class="text-sm text-gray-600">{employee.position}</p>
 								</div>
 							</a>
-							<div class="flex space-x-2">
+							<div class="flex space-x-3">
 								<button
 									onclick={() => startEditing(employee)}
 									class="text-gray-500 hover:text-blue-600"
@@ -188,6 +188,7 @@
 									<i data-lucide="pencil" class="w-4 h-4"></i>
 								</button>
 								<form
+									class="items-center flex"
 									method="POST"
 									action="?/archiveEmployee&id={employee.id}"
 									use:enhance={({ cancel }) => {
