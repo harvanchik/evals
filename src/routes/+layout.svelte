@@ -19,7 +19,7 @@
 </script>
 
 <svelte:head>
-	<link rel="apple-touch-icon" href="%sveltekit.assets%/app.png" />
+	<link rel="apple-touch-icon" href="/app.png" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<meta name="apple-mobile-web-app-title" content="EPT" />
