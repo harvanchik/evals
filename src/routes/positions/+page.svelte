@@ -98,7 +98,10 @@
 						rows="3"
 					></textarea>
 				</label>
-				<ColorInput bind:value={newPosition.color} />
+				<label class="block">
+					<span class="text-gray-700">Color</span>
+					<ColorInput bind:value={newPosition.color} />
+				</label>
 				<input type="hidden" name="color" value={newPosition.color} />
 
 				<div class="flex items-center space-x-2">

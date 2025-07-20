@@ -14,6 +14,13 @@ const tables = [
 			}
 		},
 		foreignKeys: {
+			org_link: {
+				name: 'org_link',
+				columns: ['org'],
+				referencedTable: 'organization',
+				referencedColumns: ['code'],
+				onDelete: 'SET NULL'
+			},
 			user_link: {
 				name: 'user_link',
 				columns: ['user'],
@@ -61,6 +68,15 @@ const tables = [
 				unique: false,
 				defaultValue: null,
 				comment: ''
+			},
+			{
+				name: 'org',
+				type: 'link',
+				link: { table: 'organization' },
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"organization"}'
 			},
 			{
 				name: 'position',
@@ -130,6 +146,13 @@ const tables = [
 				referencedColumns: ['xata_id'],
 				onDelete: 'SET NULL'
 			},
+			org_link: {
+				name: 'org_link',
+				columns: ['org'],
+				referencedTable: 'organization',
+				referencedColumns: ['code'],
+				onDelete: 'SET NULL'
+			},
 			user_link: {
 				name: 'user_link',
 				columns: ['user'],
@@ -162,6 +185,15 @@ const tables = [
 				unique: false,
 				defaultValue: null,
 				comment: ''
+			},
+			{
+				name: 'org',
+				type: 'link',
+				link: { table: 'organization' },
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"organization"}'
 			},
 			{
 				name: 'rating',
@@ -332,6 +364,95 @@ const tables = [
 		]
 	},
 	{
+		name: 'organization',
+		checkConstraints: {
+			org_xata_id_length_xata_id: {
+				name: 'org_xata_id_length_xata_id',
+				columns: ['xata_id'],
+				definition: 'CHECK ((length(xata_id) < 256))'
+			}
+		},
+		foreignKeys: {
+			admin_link: {
+				name: 'admin_link',
+				columns: ['admin'],
+				referencedTable: 'users',
+				referencedColumns: ['username'],
+				onDelete: 'SET NULL'
+			}
+		},
+		primaryKey: [],
+		uniqueConstraints: {
+			_pgroll_new_org_xata_id_key: {
+				name: '_pgroll_new_org_xata_id_key',
+				columns: ['xata_id']
+			},
+			organization__pgroll_new_code_key: {
+				name: 'organization__pgroll_new_code_key',
+				columns: ['code']
+			}
+		},
+		columns: [
+			{
+				name: 'admin',
+				type: 'link',
+				link: { table: 'users' },
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"users"}'
+			},
+			{
+				name: 'code',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'name',
+				type: 'text',
+				notNull: true,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'xata_createdat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_id',
+				type: 'text',
+				notNull: true,
+				unique: true,
+				defaultValue: "('rec_'::text || (xata_private.xid())::text)",
+				comment: ''
+			},
+			{
+				name: 'xata_updatedat',
+				type: 'datetime',
+				notNull: true,
+				unique: false,
+				defaultValue: 'now()',
+				comment: ''
+			},
+			{
+				name: 'xata_version',
+				type: 'int',
+				notNull: true,
+				unique: false,
+				defaultValue: '0',
+				comment: ''
+			}
+		]
+	},
+	{
 		name: 'positions',
 		checkConstraints: {
 			positions_xata_id_length_xata_id: {
@@ -341,6 +462,13 @@ const tables = [
 			}
 		},
 		foreignKeys: {
+			org_link: {
+				name: 'org_link',
+				columns: ['org'],
+				referencedTable: 'organization',
+				referencedColumns: ['code'],
+				onDelete: 'SET NULL'
+			},
 			user_link: {
 				name: 'user_link',
 				columns: ['user'],
@@ -372,6 +500,15 @@ const tables = [
 				unique: false,
 				defaultValue: null,
 				comment: ''
+			},
+			{
+				name: 'org',
+				type: 'link',
+				link: { table: 'organization' },
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"organization"}'
 			},
 			{
 				name: 'title',
@@ -434,6 +571,13 @@ const tables = [
 			}
 		},
 		foreignKeys: {
+			org_link: {
+				name: 'org_link',
+				columns: ['org'],
+				referencedTable: 'organization',
+				referencedColumns: ['code'],
+				onDelete: 'SET NULL'
+			},
 			user_link: {
 				name: 'user_link',
 				columns: ['user'],
@@ -473,6 +617,15 @@ const tables = [
 				unique: false,
 				defaultValue: null,
 				comment: ''
+			},
+			{
+				name: 'org',
+				type: 'link',
+				link: { table: 'organization' },
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"organization"}'
 			},
 			{
 				name: 'user',
@@ -526,7 +679,15 @@ const tables = [
 				definition: 'CHECK ((length(xata_id) < 256))'
 			}
 		},
-		foreignKeys: {},
+		foreignKeys: {
+			org_link: {
+				name: 'org_link',
+				columns: ['org'],
+				referencedTable: 'organization',
+				referencedColumns: ['code'],
+				onDelete: 'SET NULL'
+			}
+		},
 		primaryKey: [],
 		uniqueConstraints: {
 			_pgroll_new_users_xata_id_key: {
@@ -539,6 +700,15 @@ const tables = [
 			}
 		},
 		columns: [
+			{
+				name: 'org',
+				type: 'link',
+				link: { table: 'organization' },
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: '{"xata.link":"organization"}'
+			},
 			{
 				name: 'password',
 				type: 'text',
@@ -603,6 +773,9 @@ export type EntriesRecord = Entries & XataRecord;
 export type EntryHistory = InferredTypes['entry_history'];
 export type EntryHistoryRecord = EntryHistory & XataRecord;
 
+export type Organization = InferredTypes['organization'];
+export type OrganizationRecord = Organization & XataRecord;
+
 export type Positions = InferredTypes['positions'];
 export type PositionsRecord = Positions & XataRecord;
 
@@ -616,6 +789,7 @@ export type DatabaseSchema = {
 	employees: EmployeesRecord;
 	entries: EntriesRecord;
 	entry_history: EntryHistoryRecord;
+	organization: OrganizationRecord;
 	positions: PositionsRecord;
 	tags: TagsRecord;
 	users: UsersRecord;

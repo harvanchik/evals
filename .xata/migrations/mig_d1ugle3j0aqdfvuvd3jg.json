@@ -1,0 +1,30 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d1ugle3j0aqdfvuvd3jg",
+    "operations": [
+      {
+        "add_column": {
+          "table": "tags",
+          "column": {
+            "name": "org",
+            "type": "text",
+            "comment": "{\"xata.link\":\"organization\"}",
+            "nullable": true,
+            "references": {
+              "name": "org_link",
+              "table": "organization",
+              "column": "code",
+              "on_delete": "SET NULL"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d1ugle3j0aqdfvuvd3jg",
+  "parent": "mig_d1u51hjj0aqdfvuvd1pg",
+  "schema": "public",
+  "startedAt": "2025-07-20T15:26:48.864648Z"
+}

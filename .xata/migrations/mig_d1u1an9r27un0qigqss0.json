@@ -1,0 +1,19 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d1u1an9r27un0qigqss0",
+    "operations": [
+      {
+        "rename_table": {
+          "to": "organization",
+          "from": "org"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d1u1an9r27un0qigqss0",
+  "parent": "mig_d1u11taoqhr2s1o71b4g",
+  "schema": "public",
+  "startedAt": "2025-07-19T21:59:57.973462Z"
+}

@@ -7,6 +7,7 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const username = data.get('username') as string;
 		const password = (data.get('password') as string) || null;
+		const organizationName = (data.get('organization') as string) || null;
 
 		if (!username) {
 			return fail(400, { error: 'Username is required.' });
@@ -22,11 +23,21 @@ export const actions: Actions = {
 			}
 		} else {
 			// User does not exist, create a new one
-			const newUser = await xata.db.users.create({
+			const newUser: any = {
 				username,
 				password
-			});
-			user = newUser;
+			};
+			if (organizationName) {
+				let organization = await xata.db.organizations
+					.filter({ name: organizationName })
+					.getFirst();
+				if (!organization) {
+					organization = await xata.db.organizations.create({ name: organizationName });
+				}
+				newUser.organization = organization.id;
+			}
+			const createdUser = await xata.db.users.create(newUser);
+			user = createdUser;
 		}
 
 		if (user) {

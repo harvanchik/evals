@@ -37,11 +37,14 @@
 	});
 
 	let filteredTags = $derived(
-		tags.filter(
-			(tag) =>
-				(tag.name || '').toLowerCase().includes(search.toLowerCase()) ||
-				(tag.description || '').toLowerCase().includes(search.toLowerCase())
-		)
+		tags.filter((tag) => {
+			const name = typeof tag.name === 'string' ? tag.name : '';
+			const description = typeof tag.description === 'string' ? tag.description : '';
+			const searchTerm = search.toLowerCase();
+			return (
+				name.toLowerCase().includes(searchTerm) || description.toLowerCase().includes(searchTerm)
+			);
+		})
 	);
 </script>
 
@@ -91,7 +94,10 @@
 						rows="3"
 					></textarea>
 				</label>
-				<ColorInput bind:value={formState.color} />
+				<label class="block">
+					<span class="text-gray-700">Color</span>
+					<ColorInput bind:value={formState.color} />
+				</label>
 				<input type="hidden" name="color" value={formState.color} />
 				<div class="flex items-center space-x-2">
 					<button
