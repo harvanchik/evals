@@ -1,32 +1,48 @@
+import { getXataClient, type UsersRecord } from './xata';
 import type { Handle } from '@sveltejs/kit';
-import { redirect } from '@sveltejs/kit';
-import { getXataClient } from './xata';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
 
-	if (sessionId) {
-		const xata = getXataClient();
+	if (!sessionId) {
+		event.locals.user = null;
+		event.locals.orgCode = null;
+		return resolve(event);
+	}
+
+	let userId: string | undefined;
+	let orgCode: string | null = null;
+
+	// Check if the session is in the new JSON format or the old raw ID format
+	if (sessionId.startsWith('{')) {
 		try {
-			// In Xata, the record ID is just `id` on the record object.
-			const user = await xata.db.users.read(sessionId);
-			event.locals.user = user || null;
-		} catch (error) {
-			// Invalid session ID or other DB error
+			const sessionPayload = JSON.parse(sessionId);
+			userId = sessionPayload.userId;
+			orgCode = sessionPayload.orgCode;
+		} catch (e) {
+			console.error('Failed to parse session JSON:', e);
+			userId = undefined;
+		}
+	} else {
+		// Assume old format where the cookie is just the user ID
+		userId = sessionId;
+	}
+
+	if (userId) {
+		const xata = getXataClient();
+		// Fetch user and gracefully handle if the ID is invalid
+		const user = (await xata.db.users.read(userId).catch(() => null)) as UsersRecord | null;
+
+		if (user) {
+			event.locals.user = user;
+			event.locals.orgCode = orgCode; // This will be null for old sessions, which is correct
+		} else {
 			event.locals.user = null;
+			event.locals.orgCode = null;
 		}
 	} else {
 		event.locals.user = null;
-	}
-
-	// Redirect to login if not authenticated and not on the login page
-	if (!event.locals.user && event.url.pathname !== '/login') {
-		redirect(303, '/login');
-	}
-
-	// Redirect to home if authenticated and on the login page
-	if (event.locals.user && event.url.pathname === '/login') {
-		redirect(303, '/');
+		event.locals.orgCode = null;
 	}
 
 	return resolve(event);

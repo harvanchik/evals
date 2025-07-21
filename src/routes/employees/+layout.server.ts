@@ -1,14 +1,26 @@
 import { redirect } from '@sveltejs/kit';
-import type { LayoutServerLoad } from './$types';
 import { getXataClient } from '../../xata';
+import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ locals }) => {
+const xata = getXataClient();
+
+export const load: LayoutServerLoad = async ({ locals, depends }) => {
+	depends('app:employees');
 	if (!locals.user) {
 		redirect(303, '/login');
 	}
 
-	const xata = getXataClient();
-	const employees = await xata.db.employees.filter({ user: locals.user.username }).getAll();
+	const { orgCode } = locals;
+	console.log('--- Debug: /employees/+layout.server.ts ---');
+	console.log('orgCode from locals:', orgCode);
+	console.log('user from locals:', locals.user?.username);
 
-	return { employees };
+	const employees = await (orgCode
+		? xata.db.employees.filter({ org: orgCode }).getAll()
+		: xata.db.employees.filter({ user: locals.user.username }).getAll());
+
+	return {
+		user: locals.user,
+		employees
+	};
 };

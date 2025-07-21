@@ -1,76 +1,90 @@
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
 import { getXataClient } from '../../xata';
+import type { PageServerLoad, Actions } from './$types';
+import { fail } from '@sveltejs/kit';
+
+const xata = getXataClient();
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		redirect(303, '/');
+		return {
+			positions: []
+		};
 	}
+
+	const { orgCode } = locals;
+
+	const positions = await (orgCode
+		? xata.db.positions.filter({ org: orgCode }).getAll()
+		: xata.db.positions.filter({ user: locals.user.username }).getAll());
+
+	return {
+		positions
+	};
 };
 
 export const actions: Actions = {
 	createPosition: async ({ request, locals }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized', form: 'createPosition' });
-		}
-		const data = await request.formData();
-		const title = data.get('title') as string;
-		const description = data.get('description') as string;
-		const color = data.get('color') as string;
+		const formData = await request.formData();
+		const title = formData.get('title') as string;
+		const description = formData.get('description') as string;
+		const color = formData.get('color') as string;
+		const { user, orgCode } = locals;
 
-		if (!title) {
-			return fail(400, { error: 'Title is required', form: 'createPosition' });
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.positions.create({
-				title,
-				description,
-				color,
-				user: locals.user.username
-			});
-		} catch (e) {
-			return fail(500, { error: 'Failed to create position', form: 'createPosition' });
+		const positionData: any = {
+			title,
+			description,
+			color,
+			user: user.username
+		};
+
+		if (orgCode) {
+			positionData.org = orgCode;
 		}
 
-		return { success: true, form: 'createPosition' };
+		const newPosition = await xata.db.positions.create(positionData);
+
+		return {
+			newPosition
+		};
 	},
 	updatePosition: async ({ request, locals, url }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized' });
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
 		const id = url.searchParams.get('id');
+		const formData = await request.formData();
+		const title = formData.get('title') as string;
+		const description = formData.get('description') as string;
+		const color = formData.get('color') as string;
+
 		if (!id) {
 			return fail(400, { error: 'Position ID is required' });
 		}
-
-		const data = await request.formData();
-		const title = data.get('title') as string;
-		const description = data.get('description') as string;
-		const color = data.get('color') as string;
 
 		if (!title) {
 			return fail(400, { error: 'Title is required' });
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.positions.update(id, {
-				title,
-				description,
-				color
-			});
-		} catch (e) {
-			return fail(500, { error: 'Failed to update position' });
-		}
+		const updatedPosition = await xata.db.positions.update(id, {
+			title,
+			description,
+			color
+		});
 
-		return { success: true };
+		return {
+			updatedPosition
+		};
 	},
 	deletePosition: async ({ locals, url }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'Unauthorized' });
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
 		const id = url.searchParams.get('id');
@@ -79,7 +93,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			const xata = getXataClient();
 			await xata.db.positions.delete(id);
 		} catch (e) {
 			return fail(500, { error: 'Failed to delete position' });

@@ -7,13 +7,21 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const username = data.get('username') as string;
 		const password = (data.get('password') as string) || null;
-		const organizationName = (data.get('organization') as string) || null;
+		const orgCode = (data.get('organization') as string)?.toLowerCase() || null;
 
 		if (!username) {
 			return fail(400, { error: 'Username is required.' });
 		}
 
 		const xata = getXataClient();
+
+		if (orgCode) {
+			const organization = await xata.db.organization.filter({ code: orgCode }).getFirst();
+			if (!organization) {
+				return fail(400, { error: `Organization with code "${orgCode}" not found.` });
+			}
+		}
+
 		let user = await xata.db.users.filter({ username }).getFirst();
 
 		if (user) {
@@ -23,25 +31,23 @@ export const actions: Actions = {
 			}
 		} else {
 			// User does not exist, create a new one
-			const newUser: any = {
+			const newUser: { username: string; password: string | null; org?: string } = {
 				username,
 				password
 			};
-			if (organizationName) {
-				let organization = await xata.db.organizations
-					.filter({ name: organizationName })
-					.getFirst();
-				if (!organization) {
-					organization = await xata.db.organizations.create({ name: organizationName });
-				}
-				newUser.organization = organization.id;
+			if (orgCode) {
+				newUser.org = orgCode;
 			}
 			const createdUser = await xata.db.users.create(newUser);
 			user = createdUser;
 		}
 
 		if (user) {
-			cookies.set('sessionId', user.id, {
+			const sessionPayload = {
+				userId: user.id,
+				orgCode: orgCode
+			};
+			cookies.set('sessionId', JSON.stringify(sessionPayload), {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'strict',

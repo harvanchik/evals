@@ -1,71 +1,90 @@
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
 import { getXataClient } from '../../xata';
+import type { PageServerLoad, Actions } from './$types';
+import { fail } from '@sveltejs/kit';
+
+const xata = getXataClient();
+
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.user) {
+		return {
+			tags: []
+		};
+	}
+
+	const { orgCode } = locals;
+
+	const tags = await (orgCode
+		? xata.db.tags.filter({ org: orgCode }).getAll()
+		: xata.db.tags.filter({ user: locals.user.username }).getAll());
+
+	return {
+		tags
+	};
+};
 
 export const actions: Actions = {
 	createTag: async ({ request, locals }) => {
-		if (!locals.user) {
-			redirect(303, '/');
+		const formData = await request.formData();
+		const name = formData.get('name') as string;
+		const description = formData.get('description') as string;
+		const color = formData.get('color') as string;
+		const { user, orgCode } = locals;
+
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
-		const data = await request.formData();
-		const name = data.get('name') as string;
-		const description = data.get('description') as string;
-		const color = data.get('color') as string;
+		const tagData: any = {
+			name,
+			description,
+			color,
+			user: user.username
+		};
 
-		if (!name) {
-			return fail(400, { error: 'Name is required' });
+		if (orgCode) {
+			tagData.org = orgCode;
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.tags.create({
-				name,
-				description,
-				color,
-				user: locals.user.username
-			});
-		} catch (e) {
-			return fail(500, { error: 'Failed to create tag' });
-		}
+		const newTag = await xata.db.tags.create(tagData);
 
-		return { success: true };
+		return {
+			newTag
+		};
 	},
 	updateTag: async ({ request, locals, url }) => {
-		if (!locals.user) {
-			redirect(303, '/');
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
 		const id = url.searchParams.get('id');
+		const formData = await request.formData();
+		const name = formData.get('name') as string;
+		const description = formData.get('description') as string;
+		const color = formData.get('color') as string;
+
 		if (!id) {
 			return fail(400, { error: 'Tag ID is required' });
 		}
-
-		const data = await request.formData();
-		const name = data.get('name') as string;
-		const description = data.get('description') as string;
-		const color = data.get('color') as string;
 
 		if (!name) {
 			return fail(400, { error: 'Name is required' });
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.tags.update(id, {
-				name,
-				description,
-				color
-			});
-		} catch (e) {
-			return fail(500, { error: 'Failed to update tag' });
-		}
+		const updatedTag = await xata.db.tags.update(id, {
+			name,
+			description,
+			color
+		});
 
-		return { success: true };
+		return {
+			updatedTag
+		};
 	},
 	deleteTag: async ({ locals, url }) => {
-		if (!locals.user) {
-			redirect(303, '/');
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
 		const id = url.searchParams.get('id');
@@ -74,7 +93,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			const xata = getXataClient();
 			await xata.db.tags.delete(id);
 		} catch (e) {
 			return fail(500, { error: 'Failed to delete tag' });

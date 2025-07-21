@@ -1,84 +1,76 @@
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
 import { getXataClient } from '../../xata';
+import type { Actions } from './$types';
+import { fail } from '@sveltejs/kit';
+
+const xata = getXataClient();
 
 export const actions: Actions = {
 	createEmployee: async ({ request, locals }) => {
-		if (!locals.user) {
-			redirect(303, '/');
+		const formData = await request.formData();
+		const firstName = formData.get('first_name') as string;
+		const lastName = formData.get('last_name') as string;
+		const nickname = formData.get('nickname') as string;
+		const position = formData.get('position') as string;
+		const { user, orgCode } = locals;
+
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
-		const data = await request.formData();
-		const first_name = data.get('first_name') as string;
-		const last_name = data.get('last_name') as string;
-		const nickname = data.get('nickname') as string;
-		const position = data.get('position') as string;
+		const employeeData: any = {
+			first_name: firstName,
+			last_name: lastName,
+			nickname,
+			position,
+			user: user.username
+		};
 
-		if (!first_name || !last_name || !position) {
-			return fail(400, {
-				error: 'Missing required fields',
-				form: 'createEmployee'
-			});
+		if (orgCode) {
+			employeeData.org = orgCode;
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.employees.create({
-				first_name,
-				last_name,
-				nickname,
-				position,
-				user: locals.user.username,
-				archived: false
-			});
-		} catch (e) {
-			return fail(500, {
-				error: 'Failed to create employee',
-				form: 'createEmployee'
-			});
-		}
+		const newEmployee = await xata.db.employees.create(employeeData);
 
-		return { success: true, form: 'createEmployee' };
+		return {
+			newEmployee
+		};
 	},
-
 	updateEmployee: async ({ request, locals, url }) => {
-		if (!locals.user) {
-			redirect(303, '/');
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
 		const id = url.searchParams.get('id');
+		const formData = await request.formData();
+		const firstName = formData.get('first_name') as string;
+		const lastName = formData.get('last_name') as string;
+		const nickname = formData.get('nickname') as string;
+		const position = formData.get('position') as string;
+
 		if (!id) {
 			return fail(400, { error: 'Employee ID is required' });
 		}
 
-		const data = await request.formData();
-		const first_name = data.get('first_name') as string;
-		const last_name = data.get('last_name') as string;
-		const nickname = data.get('nickname') as string;
-		const position = data.get('position') as string;
-
-		if (!first_name || !last_name || !position) {
+		if (!firstName || !lastName || !position) {
 			return fail(400, { error: 'Missing required fields' });
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.employees.update(id, {
-				first_name,
-				last_name,
-				nickname,
-				position
-			});
-		} catch (e) {
-			return fail(500, { error: 'Failed to update employee' });
-		}
+		const updatedEmployee = await xata.db.employees.update(id, {
+			first_name: firstName,
+			last_name: lastName,
+			nickname,
+			position
+		});
 
-		return { success: true };
+		return {
+			updatedEmployee
+		};
 	},
-
 	archiveEmployee: async ({ locals, url }) => {
-		if (!locals.user) {
-			redirect(303, '/');
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
 		const id = url.searchParams.get('id');
@@ -86,15 +78,31 @@ export const actions: Actions = {
 			return fail(400, { error: 'Employee ID is required' });
 		}
 
-		try {
-			const xata = getXataClient();
-			await xata.db.employees.update(id, {
-				archived: true
-			});
-		} catch (e) {
-			return fail(500, { error: 'Failed to archive employee' });
+		const archivedEmployee = await xata.db.employees.update(id, {
+			archived: true
+		});
+
+		return {
+			archivedEmployee
+		};
+	},
+	restoreEmployee: async ({ locals, url }) => {
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
 		}
 
-		return { success: true };
+		const id = url.searchParams.get('id');
+		if (!id) {
+			return fail(400, { error: 'Employee ID is required' });
+		}
+
+		const restoredEmployee = await xata.db.employees.update(id, {
+			archived: false
+		});
+
+		return {
+			restoredEmployee
+		};
 	}
 };
