@@ -20,7 +20,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			userId = sessionPayload.userId;
 			orgCode = sessionPayload.orgCode;
 		} catch (e) {
-			console.error('Failed to parse session JSON:', e);
+			// Failed to parse session JSON, clear user
 			userId = undefined;
 		}
 	} else {

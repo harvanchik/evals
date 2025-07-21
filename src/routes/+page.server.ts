@@ -3,14 +3,14 @@ import type { PageServerLoad } from './$types';
 import { getXataClient } from '../xata';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!locals.user) {
+	const { user, orgCode } = locals;
+	if (!user) {
 		redirect(303, '/login');
 	}
 
 	const xata = getXataClient();
-	const employees = await xata.db.employees.filter({ user: locals.user.username }).getAll();
+	const filter = orgCode ? { org: orgCode } : { user: user.username };
+	const performanceEntries = await xata.db.entries.filter(filter).getAll();
 
-	const performanceEntries = [];
-
-	return { employees, performanceEntries };
+	return { performanceEntries };
 };

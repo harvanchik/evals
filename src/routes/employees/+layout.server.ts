@@ -11,9 +11,6 @@ export const load: LayoutServerLoad = async ({ locals, depends }) => {
 	}
 
 	const { orgCode } = locals;
-	console.log('--- Debug: /employees/+layout.server.ts ---');
-	console.log('orgCode from locals:', orgCode);
-	console.log('user from locals:', locals.user?.username);
 
 	const employees = await (orgCode
 		? xata.db.employees.filter({ org: orgCode }).getAll()

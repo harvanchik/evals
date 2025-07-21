@@ -2,7 +2,8 @@ import type { LayoutServerLoad } from './$types';
 import { getXataClient } from '../xata';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	if (!locals.user) {
+	const { user, orgCode } = locals;
+	if (!user) {
 		return {
 			user: null,
 			employees: [],
@@ -12,25 +13,31 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 	}
 
 	const xata = getXataClient();
+	const filter = orgCode ? { org: orgCode } : { user: user.username };
+
 	const [employees, positions, fetchedTags] = await Promise.all([
-		xata.db.employees.filter({ user: locals.user.username }).getAll(),
-		xata.db.positions.filter({ user: locals.user.username }).getAll(),
-		xata.db.tags.filter({ user: locals.user.username }).getAll()
+		xata.db.employees.filter(filter).getAll(),
+		xata.db.positions.filter(filter).getAll(),
+		xata.db.tags.filter(filter).getAll()
 	]);
 
 	let tags = fetchedTags;
 
 	if (tags.length === 0) {
 		const defaultTags = [
-			{ name: 'teamwork', color: '#A0C4FF', user: locals.user.username },
-			{ name: 'excellence', color: '#CAFFBF', user: locals.user.username },
-			{ name: 'adaptability', color: '#FFD6A5', user: locals.user.username },
-			{ name: 'mentorship', color: '#bdb2ff', user: locals.user.username },
-			{ name: 'communication', color: '#9BF6FF', user: locals.user.username },
-			{ name: 'respect', color: '#FFADAD', user: locals.user.username }
-		];
-		const newTags = await xata.db.tags.create(defaultTags);
-		tags = newTags;
+			{ name: 'teamwork', color: '#A0C4FF' },
+			{ name: 'excellence', color: '#CAFFBF' },
+			{ name: 'adaptability', color: '#FFD6A5' },
+			{ name: 'mentorship', color: '#bdb2ff' },
+			{ name: 'communication', color: '#9BF6FF' },
+			{ name: 'respect', color: '#FFADAD' }
+		].map((tag) => ({
+			...tag,
+			user: user.username,
+			...(orgCode && { org: orgCode })
+		}));
+		await xata.db.tags.create(defaultTags);
+		tags = await xata.db.tags.filter(filter).getAll();
 	}
 
 	return {
