@@ -1,4 +1,4 @@
-import { getXataClient } from '../../../xata.ts';
+import { getXataClient } from '../../../xata';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -6,8 +6,9 @@ const xata = getXataClient();
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const { id } = params;
+	const { user, orgCode } = locals;
 
-	if (!locals.user) {
+	if (!user) {
 		redirect(302, '/login');
 	}
 
@@ -17,15 +18,17 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		error(404, 'Employee not found');
 	}
 
-	const entries = await xata.db.entries
-		.filter({
-			'employee.id': id,
-			user: locals.user.username
-		})
+	const entries = await (
+		orgCode
+			? xata.db.entries.filter({ 'employee.id': id, org: orgCode })
+			: xata.db.entries.filter({ 'employee.id': id, user: user.username })
+	)
 		.sort('xata.createdAt', 'desc')
 		.getMany();
 
-	const tags = await xata.db.tags.filter({ user: locals.user.username }).getAll();
+	const tags = await (
+		orgCode ? xata.db.tags.filter({ org: orgCode }) : xata.db.tags.filter({ user: user.username })
+	).getAll();
 
 	return { employee, entries, tags: tags.toSerializable() };
 };
@@ -33,8 +36,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 export const actions: Actions = {
 	addEntry: async ({ request, params, locals }) => {
 		const { id: employeeId } = params;
+		const { user, orgCode } = locals;
 
-		if (!locals.user) {
+		if (!user) {
 			error(401, 'Unauthorized');
 		}
 
@@ -51,14 +55,20 @@ export const actions: Actions = {
 			return fail(400, { rating, invalid: true });
 		}
 
+		const entryData: any = {
+			employee: employeeId,
+			user: user.username,
+			note,
+			rating,
+			tags
+		};
+
+		if (orgCode) {
+			entryData.org = orgCode;
+		}
+
 		try {
-			await xata.db.entries.create({
-				employee: employeeId,
-				user: locals.user.username,
-				note,
-				rating,
-				tags
-			});
+			await xata.db.entries.create(entryData);
 		} catch (e) {
 			console.error(e);
 			return fail(500, { error: 'Could not create entry.' });
