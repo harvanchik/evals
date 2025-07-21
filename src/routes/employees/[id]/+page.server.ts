@@ -21,13 +21,15 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const entries = await (
 		orgCode
 			? xata.db.entries.filter({ 'employee.id': id, org: orgCode })
-			: xata.db.entries.filter({ 'employee.id': id, user: user.username })
+			: xata.db.entries.filter({ 'employee.id': id, user: user.username, $notExists: 'org' })
 	)
 		.sort('xata.createdAt', 'desc')
 		.getMany();
 
 	const tags = await (
-		orgCode ? xata.db.tags.filter({ org: orgCode }) : xata.db.tags.filter({ user: user.username })
+		orgCode
+			? xata.db.tags.filter({ org: orgCode })
+			: xata.db.tags.filter({ user: user.username, $notExists: 'org' })
 	).getAll();
 
 	return { employee, entries, tags: tags.toSerializable() };

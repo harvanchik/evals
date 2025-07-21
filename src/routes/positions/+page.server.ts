@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const positions = await (orgCode
 		? xata.db.positions.filter({ org: orgCode }).getAll()
-		: xata.db.positions.filter({ user: locals.user.username }).getAll());
+		: xata.db.positions.filter({ user: locals.user.username, $notExists: 'org' }).getAll());
 
 	return {
 		positions

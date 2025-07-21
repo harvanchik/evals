@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const xata = getXataClient();
-	const filter = orgCode ? { org: orgCode } : { user: user.username };
+	const filter = orgCode ? { org: orgCode } : { user: user.username, $notExists: 'org' };
 	const performanceEntries = await xata.db.entries.filter(filter).getAll();
 
 	return { performanceEntries };

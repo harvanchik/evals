@@ -14,7 +14,7 @@ export const load: LayoutServerLoad = async ({ locals, depends }) => {
 
 	const employees = await (orgCode
 		? xata.db.employees.filter({ org: orgCode }).getAll()
-		: xata.db.employees.filter({ user: locals.user.username }).getAll());
+		: xata.db.employees.filter({ user: locals.user.username, $notExists: 'org' }).getAll());
 
 	return {
 		user: locals.user,

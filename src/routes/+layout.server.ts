@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 	}
 
 	const xata = getXataClient();
-	const filter = orgCode ? { org: orgCode } : { user: user.username };
+	const filter = orgCode ? { org: orgCode } : { user: user.username, $notExists: 'org' };
 
 	const [employees, positions, fetchedTags] = await Promise.all([
 		xata.db.employees.filter(filter).getAll(),

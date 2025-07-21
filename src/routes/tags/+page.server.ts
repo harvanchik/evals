@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const tags = await (orgCode
 		? xata.db.tags.filter({ org: orgCode }).getAll()
-		: xata.db.tags.filter({ user: locals.user.username }).getAll());
+		: xata.db.tags.filter({ user: locals.user.username, $notExists: 'org' }).getAll());
 
 	return {
 		tags
