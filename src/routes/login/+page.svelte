@@ -5,6 +5,14 @@
 
 	let { form }: PageProps = $props();
 	let loading = $state(false);
+	let organization = $state('');
+
+	$effect(() => {
+		const savedOrgCode = localStorage.getItem('organizationCode');
+		if (savedOrgCode && savedOrgCode !== 'null') {
+			organization = savedOrgCode;
+		}
+	});
 </script>
 
 <svelte:head>
@@ -18,6 +26,11 @@
 			method="POST"
 			use:enhance={() => {
 				loading = true;
+				if (organization) {
+					localStorage.setItem('organizationCode', organization);
+				} else {
+					localStorage.setItem('organizationCode', 'null');
+				}
 				return async ({ update }) => {
 					await update();
 					loading = false;
@@ -54,6 +67,7 @@
 					id="organization"
 					name="organization"
 					type="text"
+					bind:value={organization}
 					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
 				/>
 			</div>
