@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import Spinner from '$lib/components/Spinner.svelte';
+	import { Plus, Minus } from 'lucide-svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -9,6 +10,7 @@
 	let positions = $derived(data.positions || []);
 	let search = $state('');
 	let loading = $state(false);
+	let mobileFormVisible = $state(false);
 
 	let formState = $state({
 		id: null as string | null,
@@ -24,6 +26,7 @@
 		formState.last_name = '';
 		formState.nickname = '';
 		formState.position = '';
+		mobileFormVisible = false;
 	}
 
 	function startEditing(employee: (typeof employees)[0]) {
@@ -32,10 +35,11 @@
 		formState.last_name = employee.last_name ?? '';
 		formState.nickname = employee.nickname ?? '';
 		formState.position = employee.position ?? '';
+		mobileFormVisible = true;
 	}
 
 	$effect(() => {
-		if (filteredEmployees && typeof lucide !== 'undefined') {
+		if (typeof lucide !== 'undefined') {
 			lucide.createIcons();
 		}
 	});
@@ -75,9 +79,24 @@
 
 	<div class="grid md:grid-cols-2 gap-8 mt-4">
 		<div>
-			<h2 class="text-xl font-semibold text-gray-700 mb-2">
-				{#if formState.id}Edit Employee{:else}Add New Employee{/if}
-			</h2>
+			<div
+				class="flex items-center mb-2 cursor-pointer md:cursor-auto"
+				onclick={() => (mobileFormVisible = !mobileFormVisible)}
+				onkeypress={() => (mobileFormVisible = !mobileFormVisible)}
+				role="button"
+				tabindex="0"
+			>
+				<h2 class="text-xl font-semibold text-gray-700">
+					{#if formState.id}Edit Employee{:else}Add New Employee{/if}
+				</h2>
+				<span class="md:hidden ml-2">
+					{#if mobileFormVisible || formState.id}
+						<Minus />
+					{:else}
+						<Plus />
+					{/if}
+				</span>
+			</div>
 			<form
 				method="POST"
 				action={formState.id ? `?/updateEmployee&id=${formState.id}` : '?/createEmployee'}
@@ -91,7 +110,8 @@
 						loading = false;
 					};
 				}}
-				class="space-y-4 p-4 border rounded"
+				class:hidden={!mobileFormVisible && !formState.id}
+				class="md:block space-y-4 p-4 border rounded"
 			>
 				<label class="block">
 					<span class="text-gray-700">First Name</span>

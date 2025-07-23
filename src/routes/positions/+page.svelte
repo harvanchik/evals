@@ -1,17 +1,15 @@
-<script module lang="ts">
-	declare const lucide: any;
-</script>
-
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { enhance } from '$app/forms';
 	import ColorInput from '$lib/components/ColorInput.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
+	import { Plus, Minus } from 'lucide-svelte';
 
 	let { data, form }: PageProps = $props();
 	let positions = $derived(data.positions || []);
 	let search = $state('');
 	let loading = $state(false);
+	let mobileFormVisible = $state(false);
 
 	let editingPositionId = $state<string | null>(null);
 	let newPosition = $state({
@@ -25,6 +23,7 @@
 		newPosition.description = '';
 		newPosition.color = '#cccccc';
 		editingPositionId = null;
+		mobileFormVisible = false;
 	}
 
 	function startEditing(position: (typeof positions)[0]) {
@@ -32,6 +31,7 @@
 		newPosition.title = typeof position.title === 'string' ? position.title : '';
 		newPosition.description = typeof position.description === 'string' ? position.description : '';
 		newPosition.color = typeof position.color === 'string' ? position.color : '#cccccc';
+		mobileFormVisible = true;
 	}
 
 	let filteredPositions = $derived(
@@ -46,7 +46,7 @@
 	);
 
 	$effect(() => {
-		if (filteredPositions && typeof lucide !== 'undefined') {
+		if (typeof lucide !== 'undefined') {
 			lucide.createIcons();
 		}
 	});
@@ -61,9 +61,24 @@
 
 	<div class="grid md:grid-cols-2 gap-8 mt-4">
 		<div>
-			<h2 class="text-xl font-semibold text-gray-700 mb-2">
-				{#if editingPositionId}Edit Position{:else}Add New Position{/if}
-			</h2>
+			<div
+				class="flex items-center mb-2 cursor-pointer md:cursor-auto"
+				onclick={() => (mobileFormVisible = !mobileFormVisible)}
+				onkeypress={() => (mobileFormVisible = !mobileFormVisible)}
+				role="button"
+				tabindex="0"
+			>
+				<h2 class="text-xl font-semibold text-gray-700">
+					{#if editingPositionId}Edit Position{:else}Add New Position{/if}
+				</h2>
+				<span class="md:hidden ml-2">
+					{#if mobileFormVisible || editingPositionId}
+						<Minus />
+					{:else}
+						<Plus />
+					{/if}
+				</span>
+			</div>
 			<form
 				method="POST"
 				action={editingPositionId ? `?/updatePosition&id=${editingPositionId}` : '?/createPosition'}
@@ -77,7 +92,8 @@
 						loading = false;
 					};
 				}}
-				class="space-y-4 p-4 border rounded"
+				class:hidden={!mobileFormVisible && !editingPositionId}
+				class="md:block space-y-4 p-4 border rounded"
 			>
 				<label class="block">
 					<span class="text-gray-700">Title</span>
