@@ -1,6 +1,7 @@
 import { getXataClient } from '../../../xata';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import type { TagsRecord } from '../../../xata';
 
 const xata = getXataClient();
 
@@ -32,11 +33,15 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			: xata.db.tags.filter({ user: user.username, $notExists: 'org' })
 	).getAll();
 
-	return { employee, entries, tags: tags.toSerializable() };
+	return {
+		employee,
+		entries,
+		tags: tags.toSerializable()
+	};
 };
 
 export const actions: Actions = {
-	addEntry: async ({ request, params, locals }) => {
+	createEntry: async ({ request, params, locals }) => {
 		const { id: employeeId } = params;
 		const { user, orgCode } = locals;
 
@@ -47,7 +52,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const note = formData.get('note') as string;
 		const rating = parseFloat(formData.get('rating') as string);
-		const tags = formData.getAll('tags') as string[];
+		const tags = (formData.get('tags') as string).split(',').filter((t) => t);
 
 		if (!note || note.trim().length === 0) {
 			return fail(400, { note, missing: true });

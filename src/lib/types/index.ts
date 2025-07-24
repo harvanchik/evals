@@ -1,3 +1,15 @@
+import type { EmployeesRecord } from '../../xata';
+
+export type EmployeeWithStats = Omit<EmployeesRecord, 'xata'> & {
+	xata: {
+		createdAt: string;
+		updatedAt: string;
+		version: number;
+	};
+	totalEntries: number;
+	avgRating: number;
+};
+
 export interface Employee {
 	id: number;
 	firstName: string;
