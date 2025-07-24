@@ -12,8 +12,17 @@ export const load: PageServerLoad = async ({ locals, parent }) => {
 	const activeEmployees = employees.filter((emp) => emp.archived !== true);
 
 	const xata = getXataClient();
-	const filter = orgCode ? { org: orgCode } : { user: user.username, $notExists: 'org' };
-	const performanceEntries = await xata.db.entries.select(['*', 'user.*']).filter(filter).getAll();
+	const baseFilter = orgCode ? { org: orgCode } : { user: user.username, $notExists: 'org' };
+
+	const filterWithArchived = {
+		...baseFilter,
+		'employee.archived': false
+	};
+
+	const performanceEntries = await xata.db.entries
+		.select(['*', 'user.*'])
+		.filter(filterWithArchived)
+		.getAll();
 
 	const totalEntries = performanceEntries.length;
 
