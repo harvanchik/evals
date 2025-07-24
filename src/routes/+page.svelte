@@ -3,6 +3,7 @@
 	import SummaryCard from '$lib/components/SummaryCard.svelte';
 	import type { EmployeeWithStats } from '$lib/types';
 	import { ArrowUp, ArrowDown } from 'lucide-svelte';
+	import { darkenColor } from '$lib/utils/colors';
 
 	let { data }: PageProps = $props();
 
@@ -10,6 +11,8 @@
 	let employees = $derived((data.employees as unknown as EmployeeWithStats[]) || []);
 	let positions = $derived(data.positions || []);
 	let search = $state('');
+	let selectedPositions = $state<string[]>([]);
+	let showPositionFilter = $state(false);
 
 	type SortKey = 'name' | 'avgRating' | 'totalEntries';
 	type SortDirection = 'asc' | 'desc';
@@ -29,6 +32,32 @@
 		)
 	);
 
+	function togglePosition(positionTitle: string | undefined | null) {
+		if (!positionTitle) return;
+		const index = selectedPositions.indexOf(positionTitle);
+		if (index > -1) {
+			selectedPositions.splice(index, 1);
+		} else {
+			selectedPositions.push(positionTitle);
+		}
+		selectedPositions = selectedPositions;
+	}
+
+	function selectAllPositions() {
+		selectedPositions = positions.map((p) => p.title).filter(Boolean) as string[];
+	}
+
+	function clearAllPositions() {
+		selectedPositions = [];
+	}
+
+	function handleClickOutside(event: MouseEvent) {
+		const menu = document.querySelector('.filter-menu');
+		if (menu && !menu.contains(event.target as Node)) {
+			showPositionFilter = false;
+		}
+	}
+
 	function setSort(key: SortKey) {
 		if (sortKey === key) {
 			sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
@@ -38,15 +67,26 @@
 		}
 	}
 
-	function sortAndFilter(items: EmployeeWithStats[], sk: SortKey, sd: SortDirection, st: string) {
+	function sortAndFilter(
+		items: EmployeeWithStats[],
+		sk: SortKey,
+		sd: SortDirection,
+		st: string,
+		sps: string[]
+	) {
 		const searchTerm = st.toLowerCase();
-		const filtered = items.filter(
+		const filteredBySearch = items.filter(
 			(emp) =>
 				`${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase().includes(searchTerm) ||
 				(emp.nickname?.toString() || '').toLowerCase().includes(searchTerm)
 		);
 
-		return filtered.sort((a, b) => {
+		const filteredByPosition =
+			sps.length === 0
+				? filteredBySearch
+				: filteredBySearch.filter((emp) => emp.position && sps.includes(emp.position));
+
+		return filteredByPosition.sort((a, b) => {
 			let compare = 0;
 			switch (sk) {
 				case 'name': {
@@ -71,6 +111,10 @@
 	<title>EPT - Dashboard</title>
 	<meta name="description" content="Employee Performance Tracker Dashboard" />
 </svelte:head>
+
+{#if showPositionFilter}
+	<div class="fixed inset-0 z-10" onclick={handleClickOutside} onkeydown={() => {}}></div>
+{/if}
 
 <section class="space-y-6 md:space-y-8">
 	<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
@@ -157,11 +201,67 @@
 						{/if}
 					{/if}
 				</button>
+				<div class="relative filter-menu">
+					<button
+						onclick={() => (showPositionFilter = !showPositionFilter)}
+						class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-1"
+						class:bg-blue-600={selectedPositions.length > 0}
+						class:text-white={selectedPositions.length > 0}
+						class:bg-gray-200={selectedPositions.length === 0}
+						class:text-gray-700={selectedPositions.length === 0}
+					>
+						Pos
+						{#if selectedPositions.length > 0}
+							<span
+								class="bg-white text-blue-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+								>{selectedPositions.length}</span
+							>
+						{/if}
+					</button>
+					{#if showPositionFilter}
+						<div
+							class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-20"
+							onclick={(e) => e.stopPropagation()}
+						>
+							<div class="py-1">
+								{#each positions as position}
+									{#if position.title}
+										<label
+											class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+										>
+											<input
+												type="checkbox"
+												class="form-checkbox h-4 w-4 text-blue-600"
+												checked={selectedPositions.includes(position.title ?? '')}
+												onchange={() => togglePosition(position.title)}
+											/>
+											<span class="ml-3 flex items-center gap-2">
+												<span
+													class="h-4 w-4 rounded-full"
+													style:background-color={position.color || '#cccccc'}
+												></span>
+												{position.title}
+											</span>
+										</label>
+									{/if}
+								{/each}
+							</div>
+							<div class="border-t border-gray-200 px-4 py-2 flex justify-between">
+								<button onclick={selectAllPositions} class="text-sm text-blue-500 hover:underline">
+									Select all
+								</button>
+								<button onclick={clearAllPositions} class="text-sm text-blue-500 hover:underline">
+									Clear all
+								</button>
+							</div>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-			{#each sortAndFilter(employees, sortKey, sortDirection, search) as employee (employee.id)}
+			{#each sortAndFilter(employees, sortKey, sortDirection, search, selectedPositions) as employee (employee.id)}
 				<a
 					href="/employees/{employee.id}"
 					class="block p-4 bg-white rounded-md shadow hover:bg-gray-50 transition-all"
