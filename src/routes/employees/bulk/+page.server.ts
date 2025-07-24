@@ -2,9 +2,20 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { getXataClient } from '../../../xata';
 
+type EmployeeCreateData = {
+	first_name: string;
+	last_name: string;
+	position: string;
+	archived: boolean;
+	user: string;
+	org?: string;
+	nickname?: string;
+};
+
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
-		if (!locals.user) {
+		const { user, orgCode } = locals;
+		if (!user) {
 			redirect(303, '/');
 		}
 
@@ -12,14 +23,14 @@ export const actions: Actions = {
 		const csvData = formData.get('csvData') as string;
 
 		const xata = getXataClient();
-		const positions = await xata.db.positions
-			.filter({ user: locals.user.username })
-			.select(['title'])
-			.getAll();
+
+		const filter = orgCode ? { org: orgCode } : { user: user.username, $notExists: 'org' };
+		const positions = await xata.db.positions.filter(filter).select(['title']).getAll();
+
 		const existingPositions = positions.map((p) => p.title?.toLowerCase());
 
 		const rows = csvData.trim().split('\n');
-		const newEmployees = [];
+		const newEmployees: EmployeeCreateData[] = [];
 		const errors: string[] = [];
 
 		rows.forEach((row, index) => {
@@ -39,13 +50,19 @@ export const actions: Actions = {
 				return;
 			}
 
-			newEmployees.push({
+			const employeeData: EmployeeCreateData = {
 				first_name,
 				last_name,
 				position,
 				archived: false,
-				user: locals.user?.username
-			});
+				user: user.username
+			};
+
+			if (orgCode) {
+				employeeData.org = orgCode;
+			}
+
+			newEmployees.push(employeeData);
 		});
 
 		if (errors.length > 0) {

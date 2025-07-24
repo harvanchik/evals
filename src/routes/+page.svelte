@@ -8,6 +8,7 @@
 
 	let stats = $derived(data.stats);
 	let employees = $derived((data.employees as unknown as EmployeeWithStats[]) || []);
+	let positions = $derived(data.positions || []);
 	let search = $state('');
 
 	type SortKey = 'name' | 'avgRating' | 'totalEntries';
@@ -15,6 +16,18 @@
 
 	let sortKey: SortKey = $state('name');
 	let sortDirection: SortDirection = $state('asc');
+
+	let positionColorMap = $derived(
+		(positions || []).reduce(
+			(acc, pos) => {
+				if (pos.title && typeof pos.color === 'string') {
+					acc[pos.title] = pos.color;
+				}
+				return acc;
+			},
+			{} as Record<string, string | null | undefined>
+		)
+	);
 
 	function setSort(key: SortKey) {
 		if (sortKey === key) {
@@ -152,6 +165,9 @@
 				<a
 					href="/employees/{employee.id}"
 					class="block p-4 bg-white rounded-md shadow hover:bg-gray-50 transition-all"
+					style:border-left="4px solid {(employee.position &&
+						positionColorMap[employee.position]) ||
+						'#cccccc'}"
 				>
 					<div class="flex justify-between items-start">
 						<div>
