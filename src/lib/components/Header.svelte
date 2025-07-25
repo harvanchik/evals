@@ -10,9 +10,7 @@
 		script.async = true;
 		script.defer = true;
 		script.onload = () => {
-			// @ts-expect-error - lucide is loaded from a script
 			if (typeof lucide !== 'undefined') {
-				// @ts-expect-error - lucide is loaded from a script
 				lucide.createIcons();
 			}
 		};
@@ -42,7 +40,7 @@
 <nav
 	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50"
 >
-	<div class="flex justify-around items-center h-16">
+	<div class="flex justify-around items-center h-18 pb-3">
 		<a
 			href="/"
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"

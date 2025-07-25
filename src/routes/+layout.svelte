@@ -18,10 +18,12 @@
 	});
 </script>
 
-{#if data.user}
-	<Header user={data.user} />
-{/if}
+<div class="flex flex-col min-h-screen">
+	{#if data.user}
+		<Header user={data.user} />
+	{/if}
 
-<main class="container mx-auto p-4 pb-20 md:pb-4">
-	{@render children()}
-</main>
+	<main class="flex-grow container mx-auto p-4 pb-20 md:pb-4">
+		{@render children()}
+	</main>
+</div>
