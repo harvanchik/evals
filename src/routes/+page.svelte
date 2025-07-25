@@ -14,6 +14,27 @@
 	let selectedPositions = $state<string[]>([]);
 	let showPositionFilter = $state(false);
 
+	$effect(() => {
+		const savedSortKey = localStorage.getItem('dashboard_sortKey');
+		if (savedSortKey) {
+			sortKey = JSON.parse(savedSortKey);
+		}
+		const savedSortDirection = localStorage.getItem('dashboard_sortDirection');
+		if (savedSortDirection) {
+			sortDirection = JSON.parse(savedSortDirection);
+		}
+		const savedSelectedPositions = localStorage.getItem('dashboard_selectedPositions');
+		if (savedSelectedPositions) {
+			selectedPositions = JSON.parse(savedSelectedPositions);
+		}
+	});
+
+	$effect(() => {
+		localStorage.setItem('dashboard_sortKey', JSON.stringify(sortKey));
+		localStorage.setItem('dashboard_sortDirection', JSON.stringify(sortDirection));
+		localStorage.setItem('dashboard_selectedPositions', JSON.stringify(selectedPositions));
+	});
+
 	type SortKey = 'name' | 'avgRating' | 'totalEntries';
 	type SortDirection = 'asc' | 'desc';
 
