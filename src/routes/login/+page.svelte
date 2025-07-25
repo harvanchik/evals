@@ -20,8 +20,11 @@
 </svelte:head>
 
 <div class="min-h-screen flex items-center justify-center bg-gray-50">
-	<div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-		<h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Welcome to EPT</h1>
+	<div class="max-w-md w-full p-8">
+		<h1 class="text-2xl font-bold text-center text-gray-800 mb-1">
+			Welcome to the Employee Performance Tracker
+		</h1>
+		<h2 class="text-sm text-center text-gray-500 mb-6">created by Jake Harvanchik</h2>
 		<form
 			method="POST"
 			use:enhance={() => {

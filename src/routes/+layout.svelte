@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Header from '$lib/components/Header.svelte';
 	import type { LayoutProps } from './$types';
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import NProgress from 'nprogress';
 	import 'nprogress/nprogress.css';
 	let { children, data }: LayoutProps = $props();
@@ -16,12 +16,21 @@
 			NProgress.done();
 		}
 	});
+
+	let isLoginPage = $derived($page.url.pathname === '/login');
 </script>
 
 <div class="flex flex-col min-h-screen bg-gray-50">
-	<Header user={data.user} />
+	{#if !isLoginPage}
+		<Header user={data.user} />
+	{/if}
 
-	<main class="flex-grow container mx-auto p-4 pb-20 md:pb-4">
+	<main
+		class="flex-grow container mx-auto"
+		class:p-4={!isLoginPage}
+		class:pb-20={!isLoginPage}
+		class:md:pb-4={!isLoginPage}
+	>
 		{@render children()}
 	</main>
 </div>
