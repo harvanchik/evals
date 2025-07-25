@@ -15,10 +15,10 @@
 </script>
 
 <header class="bg-white shadow-md md:shadow-none md:border-b md:border-gray-200">
-	<div class="container mx-auto px-4">
+	<div class="container mx-auto px-4 pt-safe">
 		<div class="flex items-center justify-between h-16">
 			<!-- Desktop Header -->
-			<div class="hidden md:flex items-center justify-between w-full pt-4">
+			<div class="hidden md:flex items-center justify-between w-full">
 				<div class="flex items-center space-x-2">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
@@ -75,7 +75,7 @@
 
 <!-- Mobile Bottom Navbar -->
 <nav
-	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50"
+	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50 pb-safe"
 >
 	<div class="flex justify-around items-center h-18">
 		<a
