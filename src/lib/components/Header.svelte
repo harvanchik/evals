@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { LogOut, User } from 'lucide-svelte';
+	import { Briefcase, LayoutDashboard, LogOut, Tags, User, Users } from 'lucide-svelte';
 	import type { UsersRecord } from '../../xata';
 
 	let { user }: { user: UsersRecord } = $props();
-	let mobileMenuOpen = $state(false);
 
 	const navLinks = [
 		{ href: '/', label: 'Dashboard' },
@@ -39,13 +38,13 @@
 					<div class="flex items-center space-x-4">
 						<div class="w-px h-6 bg-gray-300"></div>
 						<div class="flex items-center space-x-2">
-							<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-								<User class="text-gray-500" />
+							<div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+								<User class="text-gray-500 size-4" />
 							</div>
 							<span class="text-sm font-medium text-gray-700">{user.username}</span>
 						</div>
 						<a href="/logout" class="text-gray-500 hover:text-red-600">
-							<LogOut />
+							<LogOut class="size-5" />
 						</a>
 					</div>
 				</nav>
@@ -57,8 +56,8 @@
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
 				<div class="flex items-center space-x-2">
-					<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-						<User class="text-gray-500" />
+					<div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+						<User class="text-gray-500 size-4" />
 					</div>
 					<span class="text-sm font-medium text-gray-700">{user.username}</span>
 				</div>
@@ -77,7 +76,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Dashboard"
 		>
-			<i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+			<LayoutDashboard class="size-5" />
 			<span class="text-xs mt-1">Dashboard</span>
 		</a>
 		<a
@@ -85,7 +84,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Employees"
 		>
-			<i data-lucide="users" class="w-5 h-5"></i>
+			<Users class="size-5" />
 			<span class="text-xs mt-1">Employees</span>
 		</a>
 		<a
@@ -93,7 +92,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Positions"
 		>
-			<i data-lucide="briefcase" class="w-5 h-5"></i>
+			<Briefcase class="size-5" />
 			<span class="text-xs mt-1">Positions</span>
 		</a>
 		<a
@@ -101,7 +100,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Tags"
 		>
-			<i data-lucide="tags" class="w-5 h-5"></i>
+			<Tags class="size-5" />
 			<span class="text-xs mt-1">Tags</span>
 		</a>
 		<form action="/logout" method="POST" class="flex flex-col items-center">
@@ -110,7 +109,7 @@
 				class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 				aria-label="Logout"
 			>
-				<i data-lucide="log-out" class="w-5 h-5"></i>
+				<LogOut class="size-5" />
 				<span class="text-xs mt-1">Logout</span>
 			</button>
 		</form>
