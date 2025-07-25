@@ -55,7 +55,7 @@
 			</div>
 
 			<!-- START: Mobile Header -->
-			<div class="md:hidden flex items-center justify-between w-full pt-safe">
+			<div class="md:hidden flex items-center justify-between w-full">
 				<div class="flex items-center space-x-2">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
@@ -77,7 +77,7 @@
 <nav
 	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50"
 >
-	<div class="flex justify-around items-center h-18 pb-safe">
+	<div class="flex justify-around items-center h-18">
 		<a
 			href="/"
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
