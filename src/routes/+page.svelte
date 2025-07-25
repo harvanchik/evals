@@ -202,7 +202,7 @@
 					class:bg-gray-200={sortKey !== 'totalEntries'}
 					class:text-gray-700={sortKey !== 'totalEntries'}
 				>
-					Total Entries
+					No. Entries
 					{#if sortKey === 'totalEntries'}
 						{#if sortDirection === 'asc'}
 							<ArrowUp class="w-4 h-4" />
