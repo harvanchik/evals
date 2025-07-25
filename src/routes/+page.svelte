@@ -126,6 +126,26 @@
 			return sd === 'asc' ? compare : -compare;
 		});
 	}
+
+	function getRatingColor(rating: number) {
+		const colors = [
+			'#ff0d0d',
+			'#ff2e0f',
+			'#ff4e11',
+			'#ff6e13',
+			'#ff8e15',
+			'#fda324',
+			'#fab733',
+			'#d3b534',
+			'#acb334',
+			'#8BB340',
+			'#69b34c'
+		];
+		if (rating < 0) rating = 0;
+		if (rating > 5) rating = 5;
+		const index = Math.min(Math.round(rating * 2), colors.length - 1);
+		return colors[index];
+	}
 </script>
 
 <svelte:head>
@@ -314,7 +334,10 @@
 							<div class="text-sm text-gray-600">{employee.position}</div>
 						</div>
 						<div class="text-right flex-shrink-0">
-							<div class="text-sm text-gray-800 font-semibold">
+							<div
+								class="text-sm font-semibold"
+								style:color={getRatingColor(employee.avgRating || 0)}
+							>
 								{(employee.avgRating || 0).toFixed(2)} ★
 							</div>
 							<div class="text-xs text-gray-500">{employee.totalEntries} entries</div>
