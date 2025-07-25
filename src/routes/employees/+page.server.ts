@@ -1,8 +1,47 @@
 import { getXataClient } from '../../xata';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
+import type { EmployeesRecord } from '../../xata';
 
 const xata = getXataClient();
+
+export const load: PageServerLoad = async ({ locals, parent }) => {
+	const { user, orgCode } = locals;
+	if (!user) {
+		return { employees: [] };
+	}
+	const { employees } = (await parent()) as { employees: EmployeesRecord[] };
+
+	const activeEmployees = employees.filter((emp) => emp.archived !== true);
+
+	const baseFilter = orgCode ? { org: orgCode } : { user: user.username, $notExists: 'org' };
+
+	const performanceEntries = await xata.db.entries
+		.select(['*'])
+		.filter({ ...baseFilter, 'employee.archived': false })
+		.getAll();
+
+	const employeesWithStats = activeEmployees.map((employee) => {
+		const entriesForEmployee = performanceEntries.filter(
+			(entry) => entry.employee?.id === employee.id
+		);
+		const ratings = entriesForEmployee
+			.map((e) => e.rating)
+			.filter((r): r is number => typeof r === 'number');
+
+		const averageRating =
+			ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+		return {
+			...employee.toSerializable(),
+			totalEntries: entriesForEmployee.length,
+			avgRating: averageRating
+		};
+	});
+
+	return {
+		employees: employeesWithStats
+	};
+};
 
 export const actions: Actions = {
 	createEmployee: async ({ request, locals }) => {
@@ -32,7 +71,7 @@ export const actions: Actions = {
 		const newEmployee = await xata.db.employees.create(employeeData);
 
 		return {
-			newEmployee
+			newEmployee: newEmployee.toSerializable()
 		};
 	},
 	updateEmployee: async ({ request, locals, url }) => {

@@ -2,15 +2,83 @@
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import Spinner from '$lib/components/Spinner.svelte';
-	import { Plus, Minus } from 'lucide-svelte';
+	import { Plus, Minus, ArrowUp, ArrowDown } from 'lucide-svelte';
+	import type { EmployeeWithStats } from '$lib/types';
 
 	let { data, form }: PageProps = $props();
 
-	let employees = $derived(data.employees || []);
+	let employees = $state(data.employees as EmployeeWithStats[]);
 	let positions = $derived(data.positions || []);
 	let search = $state('');
 	let loading = $state(false);
 	let mobileFormVisible = $state(false);
+	let selectedPositions = $state<string[]>([]);
+	let showPositionFilter = $state(false);
+
+	$effect(() => {
+		const savedSortKey = localStorage.getItem('employees_sortKey');
+		if (savedSortKey) {
+			sortKey = JSON.parse(savedSortKey);
+		}
+		const savedSortDirection = localStorage.getItem('employees_sortDirection');
+		if (savedSortDirection) {
+			sortDirection = JSON.parse(savedSortDirection);
+		}
+		const savedSelectedPositions = localStorage.getItem('employees_selectedPositions');
+		if (savedSelectedPositions) {
+			selectedPositions = JSON.parse(savedSelectedPositions);
+		}
+	});
+
+	$effect(() => {
+		localStorage.setItem('employees_sortKey', JSON.stringify(sortKey));
+		localStorage.setItem('employees_sortDirection', JSON.stringify(sortDirection));
+		localStorage.setItem('employees_selectedPositions', JSON.stringify(selectedPositions));
+	});
+
+	type SortKey = 'name' | 'avgRating' | 'totalEntries';
+	type SortDirection = 'asc' | 'desc';
+
+	let sortKey: SortKey = $state('name');
+	let sortDirection: SortDirection = $state('asc');
+
+	let positionColorMap = $derived(
+		(positions || []).reduce(
+			(acc, pos) => {
+				if (pos.title && typeof pos.color === 'string') {
+					acc[pos.title] = pos.color;
+				}
+				return acc;
+			},
+			{} as Record<string, string | null | undefined>
+		)
+	);
+
+	function togglePosition(positionTitle: string | undefined | null) {
+		if (!positionTitle) return;
+		const index = selectedPositions.indexOf(positionTitle);
+		if (index > -1) {
+			selectedPositions.splice(index, 1);
+		} else {
+			selectedPositions.push(positionTitle);
+		}
+		selectedPositions = selectedPositions;
+	}
+
+	function selectAllPositions() {
+		selectedPositions = positions.map((p) => p.title).filter(Boolean) as string[];
+	}
+
+	function clearAllPositions() {
+		selectedPositions = [];
+	}
+
+	function handleClickOutside(event: MouseEvent) {
+		const menu = document.querySelector('.filter-menu');
+		if (menu && !menu.contains(event.target as Node)) {
+			showPositionFilter = false;
+		}
+	}
 
 	let formState = $state({
 		id: null as string | null,
@@ -44,32 +112,72 @@
 		}
 	});
 
-	let positionColorMap = $derived(
-		(data.positions || []).reduce(
-			(acc, pos) => {
-				if (pos.title && typeof pos.color === 'string') {
-					acc[pos.title] = pos.color;
-				}
-				return acc;
-			},
-			{} as Record<string, string | null | undefined>
-		)
-	);
+	function setSort(key: SortKey) {
+		if (sortKey === key) {
+			sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+		} else {
+			sortKey = key;
+			sortDirection = 'asc';
+		}
+	}
 
-	let filteredEmployees = $derived(
-		employees.filter(
+	function sortAndFilter(
+		items: EmployeeWithStats[],
+		sk: SortKey,
+		sd: SortDirection,
+		st: string,
+		sps: string[]
+	) {
+		const searchTerm = st.toLowerCase();
+		const filteredBySearch = items.filter(
 			(emp) =>
-				emp.archived !== true &&
-				((emp.first_name + ' ' + emp.last_name).toLowerCase().includes(search.toLowerCase()) ||
-					(emp.nickname || '').toLowerCase().includes(search.toLowerCase()) ||
-					(emp.position || '').toLowerCase().includes(search.toLowerCase()))
-		)
-	);
+				`${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase().includes(searchTerm) ||
+				(emp.nickname?.toString() || '').toLowerCase().includes(searchTerm)
+		);
+
+		const filteredByPosition =
+			sps.length === 0
+				? filteredBySearch
+				: filteredBySearch.filter((emp) => emp.position && sps.includes(emp.position));
+
+		return filteredByPosition.sort((a, b) => {
+			let compare = 0;
+			switch (sk) {
+				case 'name': {
+					const nameA = `${a.first_name || ''} ${a.last_name || ''}`.trim();
+					const nameB = `${b.first_name || ''} ${b.last_name || ''}`.trim();
+					compare = nameA.localeCompare(nameB);
+					break;
+				}
+				case 'avgRating':
+					compare = (a.avgRating || 0) - (b.avgRating || 0);
+					break;
+				case 'totalEntries':
+					compare = (a.totalEntries || 0) - (b.totalEntries || 0);
+					break;
+			}
+			return sd === 'asc' ? compare : -compare;
+		});
+	}
 </script>
 
 <svelte:head>
 	<title>Employees</title>
 </svelte:head>
+
+{#if showPositionFilter}
+	<div
+		class="fixed inset-0 z-10"
+		role="button"
+		tabindex="0"
+		onclick={handleClickOutside}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') {
+				showPositionFilter = false;
+			}
+		}}
+	></div>
+{/if}
 
 <div class="p-4">
 	<div class="flex justify-between items-center mb-4">
@@ -102,11 +210,15 @@
 				action={formState.id ? `?/updateEmployee&id=${formState.id}` : '?/createEmployee'}
 				use:enhance={() => {
 					loading = true;
-					return async ({ result, update }) => {
-						if (result.type === 'success') {
+
+					return async ({ update, result }) => {
+						await update({ reset: false });
+						if (result.type === 'success' && result.data?.newEmployee) {
+							const newEmployee = result.data.newEmployee as EmployeeWithStats;
+							employees.unshift(newEmployee);
+							employees = employees;
 							handleReset();
 						}
-						await update({ reset: false });
 						loading = false;
 					};
 				}}
@@ -191,16 +303,141 @@
 		<div>
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-700">Employees</h2>
-				<input
-					type="text"
-					bind:value={search}
-					placeholder="Search employees..."
-					class="w-full ml-5 p-2 border rounded"
-				/>
 			</div>
-			{#if filteredEmployees.length}
+			<div class="flex flex-col gap-4 mb-4">
+				<div class="flex-grow">
+					<input
+						type="text"
+						bind:value={search}
+						placeholder="Search employees..."
+						class="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+					/>
+				</div>
+				<div class="flex items-center justify-start gap-2 flex-wrap select-none">
+					<span class="text-sm font-medium text-gray-600 hidden md:block">Sort by:</span>
+					<button
+						onclick={() => setSort('name')}
+						class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1 cursor-pointer"
+						class:bg-blue-600={sortKey === 'name'}
+						class:text-white={sortKey === 'name'}
+						class:bg-gray-200={sortKey !== 'name'}
+						class:text-gray-700={sortKey !== 'name'}
+					>
+						Name
+						{#if sortKey === 'name'}
+							{#if sortDirection === 'asc'}
+								<ArrowUp class="w-4 h-4" />
+							{:else}
+								<ArrowDown class="w-4 h-4" />
+							{/if}
+						{/if}
+					</button>
+					<button
+						onclick={() => setSort('avgRating')}
+						class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1 cursor-pointer"
+						class:bg-blue-600={sortKey === 'avgRating'}
+						class:text-white={sortKey === 'avgRating'}
+						class:bg-gray-200={sortKey !== 'avgRating'}
+						class:text-gray-700={sortKey !== 'avgRating'}
+					>
+						Avg. Rating
+						{#if sortKey === 'avgRating'}
+							{#if sortDirection === 'asc'}
+								<ArrowUp class="w-4 h-4" />
+							{:else}
+								<ArrowDown class="w-4 h-4" />
+							{/if}
+						{/if}
+					</button>
+					<button
+						onclick={() => setSort('totalEntries')}
+						class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1 cursor-pointer"
+						class:bg-blue-600={sortKey === 'totalEntries'}
+						class:text-white={sortKey === 'totalEntries'}
+						class:bg-gray-200={sortKey !== 'totalEntries'}
+						class:text-gray-700={sortKey !== 'totalEntries'}
+					>
+						No. Entries
+						{#if sortKey === 'totalEntries'}
+							{#if sortDirection === 'asc'}
+								<ArrowUp class="w-4 h-4" />
+							{:else}
+								<ArrowDown class="w-4 h-4" />
+							{/if}
+						{/if}
+					</button>
+					<div class="relative filter-menu">
+						<button
+							onclick={() => (showPositionFilter = !showPositionFilter)}
+							class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center text-center justify-around w-15 cursor-pointer"
+							class:bg-blue-600={selectedPositions.length > 0}
+							class:text-white={selectedPositions.length > 0}
+							class:bg-gray-200={selectedPositions.length === 0}
+							class:text-gray-700={selectedPositions.length === 0}
+							class:justify-between={selectedPositions.length > 0}
+						>
+							<span>Pos</span>
+							{#if selectedPositions.length > 0}
+								<span
+									class="bg-white text-blue-600 text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center"
+									>{selectedPositions.length}</span
+								>
+							{/if}
+						</button>
+						{#if showPositionFilter}
+							<div
+								class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-20"
+								role="presentation"
+								onclick={(e) => e.stopPropagation()}
+								onkeydown={() => {}}
+							>
+								<div class="py-1">
+									{#each positions as position}
+										{#if position.title}
+											<label
+												class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+											>
+												<input
+													type="checkbox"
+													class="form-checkbox h-4 w-4 text-blue-600"
+													checked={selectedPositions.includes(position.title)}
+													onchange={() => togglePosition(position.title)}
+												/>
+												<span class="ml-3 flex items-center gap-2">
+													<span
+														class="h-4 w-4 rounded-full"
+														style:background-color={typeof position.color === 'string'
+															? position.color
+															: '#cccccc'}
+													></span>
+													{position.title}
+												</span>
+											</label>
+										{/if}
+									{/each}
+								</div>
+								<div class="border-t border-gray-200 px-4 py-2 flex justify-between">
+									<button
+										onclick={selectAllPositions}
+										class="text-sm text-blue-500 hover:underline cursor-pointer"
+									>
+										Select all
+									</button>
+									<button
+										onclick={clearAllPositions}
+										class="text-sm text-blue-500 hover:underline cursor-pointer"
+									>
+										Clear all
+									</button>
+								</div>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+			{#if sortAndFilter(employees, sortKey, sortDirection, search, selectedPositions).length}
 				<ul class="space-y-2">
-					{#each filteredEmployees as employee (employee.id)}
+					{#each sortAndFilter(employees, sortKey, sortDirection, search, selectedPositions) as employee (employee.id)}
 						<li
 							class="p-4 rounded-lg shadow flex justify-between items-center"
 							style:border-left="4px solid {(employee.position &&
