@@ -113,7 +113,17 @@
 </svelte:head>
 
 {#if showPositionFilter}
-	<div class="fixed inset-0 z-10" onclick={handleClickOutside} onkeydown={() => {}}></div>
+	<div
+		class="fixed inset-0 z-10"
+		role="button"
+		tabindex="0"
+		onclick={handleClickOutside}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') {
+				showPositionFilter = false;
+			}
+		}}
+	></div>
 {/if}
 
 <section class="space-y-6 md:space-y-8">
@@ -204,13 +214,14 @@
 				<div class="relative filter-menu">
 					<button
 						onclick={() => (showPositionFilter = !showPositionFilter)}
-						class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-1"
+						class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center text-center justify-around w-18"
 						class:bg-blue-600={selectedPositions.length > 0}
 						class:text-white={selectedPositions.length > 0}
 						class:bg-gray-200={selectedPositions.length === 0}
 						class:text-gray-700={selectedPositions.length === 0}
+						class:justify-between={selectedPositions.length > 0}
 					>
-						Pos
+						<span>Pos</span>
 						{#if selectedPositions.length > 0}
 							<span
 								class="bg-white text-blue-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
@@ -221,7 +232,9 @@
 					{#if showPositionFilter}
 						<div
 							class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-20"
+							role="presentation"
 							onclick={(e) => e.stopPropagation()}
+							onkeydown={() => {}}
 						>
 							<div class="py-1">
 								{#each positions as position}
@@ -232,13 +245,15 @@
 											<input
 												type="checkbox"
 												class="form-checkbox h-4 w-4 text-blue-600"
-												checked={selectedPositions.includes(position.title ?? '')}
+												checked={selectedPositions.includes(position.title)}
 												onchange={() => togglePosition(position.title)}
 											/>
 											<span class="ml-3 flex items-center gap-2">
 												<span
 													class="h-4 w-4 rounded-full"
-													style:background-color={position.color || '#cccccc'}
+													style:background-color={typeof position.color === 'string'
+														? position.color
+														: '#cccccc'}
 												></span>
 												{position.title}
 											</span>
