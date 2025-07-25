@@ -18,10 +18,8 @@
 	});
 </script>
 
-<div class="flex flex-col min-h-screen">
-	{#if data.user}
-		<Header user={data.user} />
-	{/if}
+<div class="flex flex-col min-h-screen bg-gray-50">
+	<Header user={data.user} />
 
 	<main class="flex-grow container mx-auto p-4 pb-20 md:pb-4">
 		{@render children()}

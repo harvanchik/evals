@@ -1,42 +1,73 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { LogOut, User } from 'lucide-svelte';
 	import type { UsersRecord } from '../../xata';
-	import { onMount } from 'svelte';
 
-	let { user } = $props<{ user: UsersRecord }>();
+	let { user }: { user: UsersRecord } = $props();
+	let mobileMenuOpen = $state(false);
 
-	onMount(() => {
-		const script = document.createElement('script');
-		script.src = 'https://unpkg.com/lucide@latest';
-		script.async = true;
-		script.defer = true;
-		script.onload = () => {
-			if (typeof lucide !== 'undefined') {
-				lucide.createIcons();
-			}
-		};
-		document.body.appendChild(script);
-
-		return () => {
-			document.body.removeChild(script);
-		};
-	});
+	const navLinks = [
+		{ href: '/', label: 'Dashboard' },
+		{ href: '/employees', label: 'Employees' },
+		{ href: '/positions', label: 'Positions' },
+		{ href: '/tags', label: 'Tags' }
+	];
 </script>
 
-<header class="bg-gray-100 text-gray-800 shadow-md">
-	<nav class="container mx-auto px-4 py-2 flex justify-between items-center">
-		<a href="/" class="text-xl font-bold">EPT</a>
-		<div class="hidden md:flex space-x-4 items-center">
-			<a href="/" class="hover:underline">Dashboard</a>
-			<a href="/employees" class="hover:underline">Employees</a>
-			<a href="/positions" class="hover:underline">Positions</a>
-			<a href="/tags" class="hover:underline">Tags</a>
-			<form action="/logout" method="POST">
-				<button type="submit" class="hover:underline cursor-pointer">Logout</button>
-			</form>
+<header class="bg-white shadow-md md:shadow-none md:border-b md:border-gray-200">
+	<div class="container mx-auto px-4">
+		<div class="flex items-center justify-between md:h-16 h-20">
+			<!-- Desktop Header -->
+			<div class="hidden md:flex items-center justify-between w-full">
+				<div class="flex items-center space-x-2">
+					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
+				</div>
+				<nav class="flex items-center space-x-2">
+					{#each navLinks as link}
+						<a
+							href={link.href}
+							class="px-3 py-2 rounded-md text-sm font-medium"
+							class:text-blue-600={$page.url.pathname === link.href}
+							class:bg-blue-50={$page.url.pathname === link.href}
+							class:text-gray-600={$page.url.pathname !== link.href}
+							class:hover:bg-gray-100={$page.url.pathname !== link.href}
+						>
+							{link.label}
+						</a>
+					{/each}
+
+					<div class="flex items-center space-x-4">
+						<div class="w-px h-6 bg-gray-300"></div>
+						<div class="flex items-center space-x-2">
+							<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+								<User class="text-gray-500" />
+							</div>
+							<span class="text-sm font-medium text-gray-700">{user.username}</span>
+						</div>
+						<a href="/logout" class="text-gray-500 hover:text-red-600">
+							<LogOut />
+						</a>
+					</div>
+				</nav>
+			</div>
+
+			<!-- Mobile Header -->
+			<div class="md:hidden flex items-center justify-between w-full pt-6">
+				<div class="flex items-center space-x-2">
+					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
+				</div>
+				<div class="flex items-center space-x-2">
+					<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+						<User class="text-gray-500" />
+					</div>
+					<span class="text-sm font-medium text-gray-700">{user.username}</span>
+				</div>
+			</div>
 		</div>
-	</nav>
+	</div>
 </header>
 
+<!-- Mobile Bottom Navbar -->
 <nav
 	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50"
 >

@@ -19,6 +19,13 @@ export const actions: Actions = {
 			return fail(400, { error: 'Username is required.' });
 		}
 
+		if (username.length > 16) {
+			return fail(400, { error: 'Username cannot be longer than 16 characters.' });
+		}
+		if (password && password.length > 16) {
+			return fail(400, { error: 'Password cannot be longer than 16 characters.' });
+		}
+
 		const xata = getXataClient();
 
 		if (orgCode) {
