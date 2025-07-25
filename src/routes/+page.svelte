@@ -203,7 +203,7 @@
 				<span class="text-sm font-medium text-gray-600 hidden md:block">Sort by:</span>
 				<button
 					onclick={() => setSort('name')}
-					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1"
+					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1 cursor-pointer"
 					class:bg-blue-600={sortKey === 'name'}
 					class:text-white={sortKey === 'name'}
 					class:bg-gray-200={sortKey !== 'name'}
@@ -220,7 +220,7 @@
 				</button>
 				<button
 					onclick={() => setSort('avgRating')}
-					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1"
+					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1 cursor-pointer"
 					class:bg-blue-600={sortKey === 'avgRating'}
 					class:text-white={sortKey === 'avgRating'}
 					class:bg-gray-200={sortKey !== 'avgRating'}
@@ -237,7 +237,7 @@
 				</button>
 				<button
 					onclick={() => setSort('totalEntries')}
-					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1"
+					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1 cursor-pointer"
 					class:bg-blue-600={sortKey === 'totalEntries'}
 					class:text-white={sortKey === 'totalEntries'}
 					class:bg-gray-200={sortKey !== 'totalEntries'}
@@ -255,7 +255,7 @@
 				<div class="relative filter-menu">
 					<button
 						onclick={() => (showPositionFilter = !showPositionFilter)}
-						class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center text-center justify-around w-16"
+						class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center text-center justify-around w-15 cursor-pointer"
 						class:bg-blue-600={selectedPositions.length > 0}
 						class:text-white={selectedPositions.length > 0}
 						class:bg-gray-200={selectedPositions.length === 0}
@@ -265,7 +265,7 @@
 						<span>Pos</span>
 						{#if selectedPositions.length > 0}
 							<span
-								class="bg-white text-blue-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+								class="bg-white text-blue-600 text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center"
 								>{selectedPositions.length}</span
 							>
 						{/if}
@@ -303,10 +303,16 @@
 								{/each}
 							</div>
 							<div class="border-t border-gray-200 px-4 py-2 flex justify-between">
-								<button onclick={selectAllPositions} class="text-sm text-blue-500 hover:underline">
+								<button
+									onclick={selectAllPositions}
+									class="text-sm text-blue-500 hover:underline cursor-pointer"
+								>
 									Select all
 								</button>
-								<button onclick={clearAllPositions} class="text-sm text-blue-500 hover:underline">
+								<button
+									onclick={clearAllPositions}
+									class="text-sm text-blue-500 hover:underline cursor-pointer"
+								>
 									Clear all
 								</button>
 							</div>
