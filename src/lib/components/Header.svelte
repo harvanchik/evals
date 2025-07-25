@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Briefcase, LayoutDashboard, LogOut, Tags, User, Users } from 'lucide-svelte';
+	import { LogOut, User } from 'lucide-svelte';
 	import type { UsersRecord } from '../../xata';
 
-	let { user }: { user: UsersRecord } = $props();
+	let { user }: { user: UsersRecord | null } = $props();
+	let mobileMenuOpen = $state(false);
 
 	const navLinks = [
 		{ href: '/', label: 'Dashboard' },
@@ -21,33 +22,36 @@
 				<div class="flex items-center space-x-2">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
-				<nav class="flex items-center space-x-2">
-					{#each navLinks as link}
-						<a
-							href={link.href}
-							class="px-3 py-2 rounded-md text-sm font-medium"
-							class:text-blue-600={$page.url.pathname === link.href}
-							class:bg-blue-50={$page.url.pathname === link.href}
-							class:text-gray-600={$page.url.pathname !== link.href}
-							class:hover:bg-gray-100={$page.url.pathname !== link.href}
-						>
-							{link.label}
-						</a>
-					{/each}
-
-					<div class="flex items-center space-x-4">
-						<div class="w-px h-6 bg-gray-300"></div>
-						<div class="flex items-center space-x-2">
-							<div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-								<User class="text-gray-500 size-4" />
+				<div class="flex items-center space-x-2">
+					<nav class="flex items-center space-x-2">
+						{#each navLinks as link}
+							<a
+								href={link.href}
+								class="px-3 py-2 rounded-md text-sm font-medium"
+								class:text-blue-600={$page.url.pathname === link.href}
+								class:bg-blue-50={$page.url.pathname === link.href}
+								class:text-gray-600={$page.url.pathname !== link.href}
+								class:hover:bg-gray-100={$page.url.pathname !== link.href}
+							>
+								{link.label}
+							</a>
+						{/each}
+					</nav>
+					{#if user}
+						<div class="flex items-center space-x-4">
+							<div class="w-px h-6 bg-gray-300"></div>
+							<div class="flex items-center space-x-2">
+								<div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
+									<User class="text-gray-500 scale-80" />
+								</div>
+								<span class="text-sm font-medium text-gray-700">{user.username}</span>
 							</div>
-							<span class="text-sm font-medium text-gray-700">{user.username}</span>
+							<a href="/logout" class="text-gray-500 hover:text-red-600 w-full scale-80">
+								<LogOut />
+							</a>
 						</div>
-						<a href="/logout" class="text-gray-500 hover:text-red-600">
-							<LogOut class="size-5" />
-						</a>
-					</div>
-				</nav>
+					{/if}
+				</div>
 			</div>
 
 			<!-- Mobile Header -->
@@ -55,12 +59,14 @@
 				<div class="flex items-center space-x-2">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
-				<div class="flex items-center space-x-2">
-					<div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-						<User class="text-gray-500 size-4" />
+				{#if user}
+					<div class="flex items-center space-x-2">
+						<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+							<User class="text-gray-500" />
+						</div>
+						<span class="text-sm font-medium text-gray-700">{user.username}</span>
 					</div>
-					<span class="text-sm font-medium text-gray-700">{user.username}</span>
-				</div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -76,7 +82,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Dashboard"
 		>
-			<LayoutDashboard class="size-5" />
+			<i data-lucide="layout-dashboard" class="w-5 h-5"></i>
 			<span class="text-xs mt-1">Dashboard</span>
 		</a>
 		<a
@@ -84,7 +90,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Employees"
 		>
-			<Users class="size-5" />
+			<i data-lucide="users" class="w-5 h-5"></i>
 			<span class="text-xs mt-1">Employees</span>
 		</a>
 		<a
@@ -92,7 +98,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Positions"
 		>
-			<Briefcase class="size-5" />
+			<i data-lucide="briefcase" class="w-5 h-5"></i>
 			<span class="text-xs mt-1">Positions</span>
 		</a>
 		<a
@@ -100,18 +106,20 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Tags"
 		>
-			<Tags class="size-5" />
+			<i data-lucide="tags" class="w-5 h-5"></i>
 			<span class="text-xs mt-1">Tags</span>
 		</a>
-		<form action="/logout" method="POST" class="flex flex-col items-center">
-			<button
-				type="submit"
-				class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
-				aria-label="Logout"
-			>
-				<LogOut class="size-5" />
-				<span class="text-xs mt-1">Logout</span>
-			</button>
-		</form>
+		{#if user}
+			<form action="/logout" method="POST" class="flex flex-col items-center">
+				<button
+					type="submit"
+					class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+					aria-label="Logout"
+				>
+					<i data-lucide="log-out" class="w-5 h-5"></i>
+					<span class="text-xs mt-1">Logout</span>
+				</button>
+			</form>
+		{/if}
 	</div>
 </nav>

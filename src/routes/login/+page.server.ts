@@ -3,9 +3,13 @@ import type { Actions, PageServerLoad } from './$types';
 import { getXataClient } from '../../xata';
 
 export const load: PageServerLoad = async ({ locals }) => {
+	// This load function is no longer necessary as the logic is handled in hooks.server.ts
+	// We can leave it empty or remove it. For clarity, we'll leave it but commented out.
+	/*
 	if (locals.user) {
 		redirect(303, '/');
 	}
+	*/
 };
 
 export const actions: Actions = {
