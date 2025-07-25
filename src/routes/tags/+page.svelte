@@ -58,7 +58,7 @@
 	<title>Tags</title>
 </svelte:head>
 
-<div class="p-4">
+<div>
 	<h1 class="text-2xl font-bold text-gray-800">Manage Tags</h1>
 
 	<div class="grid md:grid-cols-2 gap-8 mt-4">
