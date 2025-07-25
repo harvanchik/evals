@@ -15,7 +15,7 @@
 </script>
 
 <header class="bg-white shadow-md md:shadow-none md:border-b md:border-gray-200">
-	<div class="container mx-auto px-4 pt-[calc(env(safe-area-inset-top)-0.5rem)]">
+	<div class="container mx-auto px-4 pt-[calc(env(safe-area-inset-top)-1rem)]">
 		<div class="flex items-center justify-between h-16">
 			<!-- Desktop Header -->
 			<div class="hidden md:flex items-center justify-between w-full">
@@ -75,7 +75,7 @@
 
 <!-- Mobile Bottom Navbar -->
 <nav
-	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50 pb-[calc(env(safe-area-inset-bottom)-0.5rem)]"
+	class="md:hidden fixed bottom-0 inset-x-0 bg-gray-100 text-gray-800 border-t border-gray-200 z-50 pb-[calc(env(safe-area-inset-bottom)-1rem)]"
 >
 	<div class="flex justify-around items-center h-18">
 		<a
