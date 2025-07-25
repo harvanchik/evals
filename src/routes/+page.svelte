@@ -158,11 +158,11 @@
 					class="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
 				/>
 			</div>
-			<div class="flex items-center justify-start md:justify-end gap-2 flex-wrap">
+			<div class="flex items-center justify-start md:justify-end gap-2 flex-wrap select-none">
 				<span class="text-sm font-medium text-gray-600 hidden md:block">Sort by:</span>
 				<button
 					onclick={() => setSort('name')}
-					class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-1"
+					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1"
 					class:bg-blue-600={sortKey === 'name'}
 					class:text-white={sortKey === 'name'}
 					class:bg-gray-200={sortKey !== 'name'}
@@ -179,7 +179,7 @@
 				</button>
 				<button
 					onclick={() => setSort('avgRating')}
-					class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-1"
+					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1"
 					class:bg-blue-600={sortKey === 'avgRating'}
 					class:text-white={sortKey === 'avgRating'}
 					class:bg-gray-200={sortKey !== 'avgRating'}
@@ -196,7 +196,7 @@
 				</button>
 				<button
 					onclick={() => setSort('totalEntries')}
-					class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-1"
+					class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center gap-1"
 					class:bg-blue-600={sortKey === 'totalEntries'}
 					class:text-white={sortKey === 'totalEntries'}
 					class:bg-gray-200={sortKey !== 'totalEntries'}
@@ -214,7 +214,7 @@
 				<div class="relative filter-menu">
 					<button
 						onclick={() => (showPositionFilter = !showPositionFilter)}
-						class="px-3 py-1.5 text-sm font-medium rounded-md flex items-center text-center justify-around w-18"
+						class="px-2 py-1 text-[13px] font-medium rounded-md flex items-center text-center justify-around w-16"
 						class:bg-blue-600={selectedPositions.length > 0}
 						class:text-white={selectedPositions.length > 0}
 						class:bg-gray-200={selectedPositions.length === 0}
