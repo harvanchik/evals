@@ -163,7 +163,7 @@
 								<button
 									type="button"
 									onclick={() => toggleTag(tag.name!)}
-									class="cursor-pointer px-3 py-1.5 text-sm font-semibold rounded-md transition-all duration-200"
+									class="cursor-pointer px-2 py-1 text-sm font-semibold rounded-md transition-all duration-200"
 									class:selected={isSelected}
 									style="--tag-color: {rgbColor}; --tag-color-dark: {darkenColor(
 										typeof tag.color === 'string' ? tag.color : '#e5e7eb',
