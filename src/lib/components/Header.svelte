@@ -16,7 +16,7 @@
 
 <header class="bg-white shadow-md md:shadow-none md:border-b md:border-gray-200">
 	<div class="container mx-auto px-4">
-		<div class="flex items-center justify-between md:h-16 h-23">
+		<div class="flex items-center justify-between h-16">
 			<!-- Desktop Header -->
 			<div class="hidden md:flex items-center justify-between w-full pt-4">
 				<div class="flex items-center space-x-2">
@@ -54,8 +54,8 @@
 				</div>
 			</div>
 
-			<!-- Mobile Header -->
-			<div class="md:hidden flex items-center justify-between w-full pt-8">
+			<!-- START: Mobile Header -->
+			<div class="md:hidden flex items-center justify-between w-full safe-top">
 				<div class="flex items-center space-x-2">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
@@ -68,6 +68,7 @@
 					</div>
 				{/if}
 			</div>
+			<!-- END: Mobile Header -->
 		</div>
 	</div>
 </header>
