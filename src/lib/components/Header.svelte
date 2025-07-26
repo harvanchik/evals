@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { LogOut, User } from 'lucide-svelte';
+	import { LogOut, User, LayoutDashboard, Users, Briefcase, Tags } from 'lucide-svelte';
 	import type { UsersRecord } from '../../xata';
 
 	let { user }: { user: UsersRecord | null } = $props();
@@ -83,7 +83,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Dashboard"
 		>
-			<i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+			<LayoutDashboard class="w-5 h-5" />
 			<span class="text-xs mt-1">Dashboard</span>
 		</a>
 		<a
@@ -91,7 +91,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Employees"
 		>
-			<i data-lucide="users" class="w-5 h-5"></i>
+			<Users class="w-5 h-5" />
 			<span class="text-xs mt-1">Employees</span>
 		</a>
 		<a
@@ -99,7 +99,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Positions"
 		>
-			<i data-lucide="briefcase" class="w-5 h-5"></i>
+			<Briefcase class="w-5 h-5" />
 			<span class="text-xs mt-1">Positions</span>
 		</a>
 		<a
@@ -107,7 +107,7 @@
 			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Tags"
 		>
-			<i data-lucide="tags" class="w-5 h-5"></i>
+			<Tags class="w-5 h-5" />
 			<span class="text-xs mt-1">Tags</span>
 		</a>
 		{#if user}
@@ -117,7 +117,7 @@
 					class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 					aria-label="Logout"
 				>
-					<i data-lucide="log-out" class="w-5 h-5"></i>
+					<LogOut class="w-5 h-5" />
 					<span class="text-xs mt-1">Logout</span>
 				</button>
 			</form>

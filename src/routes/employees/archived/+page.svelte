@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { enhance } from '$app/forms';
+	import { ArchiveRestore, Eye } from 'lucide-svelte';
 
 	let { data }: PageProps = $props();
 
@@ -77,7 +78,7 @@
 							class="text-gray-500 hover:text-blue-600"
 							aria-label="View employee"
 						>
-							<i data-lucide="eye" class="w-5 h-5"></i>
+							<Eye class="w-5 h-5" />
 						</a>
 						<form
 							class="items-center flex"
@@ -103,7 +104,7 @@
 								class="text-gray-500 hover:text-green-600 cursor-pointer"
 								aria-label="Reinstate employee"
 							>
-								<i data-lucide="archive-restore" class="w-5 h-5"></i>
+								<ArchiveRestore class="w-5 h-5" />
 							</button>
 						</form>
 					</div>

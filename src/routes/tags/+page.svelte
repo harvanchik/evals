@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import ColorInput from '$lib/components/ColorInput.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
-	import { Plus, Minus } from 'lucide-svelte';
+	import { Plus, Minus, Pencil, Trash2 } from 'lucide-svelte';
 
 	let { data, form }: PageProps = $props();
 	let tags = $derived(data.tags || []);
@@ -177,7 +177,7 @@
 									class="text-gray-500 hover:text-blue-600 cursor-pointer"
 									aria-label="Edit tag"
 								>
-									<i data-lucide="pencil" class="w-5 h-5"></i>
+									<Pencil class="w-5 h-5" />
 								</button>
 								<form
 									class="items-center flex"
@@ -200,7 +200,7 @@
 										aria-label="Delete tag"
 										disabled={loading}
 									>
-										<i data-lucide="trash-2" class="w-5 h-5"></i>
+										<Trash2 class="w-5 h-5" />
 									</button>
 								</form>
 							</div>

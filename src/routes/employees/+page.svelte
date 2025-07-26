@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import Spinner from '$lib/components/Spinner.svelte';
-	import { Plus, Minus, ArrowUp, ArrowDown } from 'lucide-svelte';
+	import { Plus, Minus, ArrowUp, ArrowDown, Archive, Pencil } from 'lucide-svelte';
 	import type { EmployeeWithStats } from '$lib/types';
 
 	let { data, form }: PageProps = $props();
@@ -489,7 +489,7 @@
 									class="text-gray-500 hover:text-blue-600 cursor-pointer"
 									aria-label="Edit employee"
 								>
-									<i data-lucide="pencil" class="w-5 h-5"></i>
+									<Pencil class="w-5 h-5" />
 								</button>
 								<form
 									class="items-center flex"
@@ -524,7 +524,7 @@
 										aria-label="Archive employee"
 										disabled={loading}
 									>
-										<i data-lucide="archive" class="w-5 h-5"></i>
+										<Archive class="w-5 h-5" />
 									</button>
 								</form>
 							</div>
