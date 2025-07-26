@@ -159,6 +159,26 @@
 			return sd === 'asc' ? compare : -compare;
 		});
 	}
+
+	function getRatingColor(rating: number) {
+		const colors = [
+			'#ff0d0d',
+			'#ff2e0f',
+			'#ff4e11',
+			'#ff6e13',
+			'#ff8e15',
+			'#fda324',
+			'#fab733',
+			'#d3b534',
+			'#acb334',
+			'#8BB340',
+			'#69b34c'
+		];
+		if (rating < 0) rating = 0;
+		if (rating > 5) rating = 5;
+		const index = Math.min(Math.round(rating * 2), colors.length - 1);
+		return colors[index];
+	}
 </script>
 
 <svelte:head>
@@ -446,9 +466,19 @@
 						>
 							<a href="/employees/{employee.id}" class="flex-grow">
 								<div>
-									<p class="font-bold">
+									<p class="font-bold flex items-center gap-1">
 										{employee.nickname || employee.first_name}
 										{employee.last_name}
+										{#if employee?.totalEntries > 0}
+											<span
+												class="ml-0.5 font-semibold text-sm"
+												style:color={getRatingColor(employee?.avgRating || 0)}
+											>
+												{employee?.avgRating?.toFixed(1)}★
+											</span>
+										{/if}
+										<span class="text-gray-500 font-normal text-xs">({employee?.totalEntries})</span
+										>
 									</p>
 									<p class="text-sm text-gray-600">{employee.position}</p>
 								</div>
@@ -465,10 +495,22 @@
 									class="items-center flex"
 									method="POST"
 									action="?/archiveEmployee&id={employee.id}"
-									use:enhance={({ cancel }) => {
+									use:enhance={({ cancel, formElement }) => {
 										if (!confirm('Are you sure you want to archive this employee?')) {
 											cancel();
+											return;
 										}
+
+										const url = new URL(formElement.action);
+										const id = url.searchParams.get('id');
+										if (id) {
+											const index = employees.findIndex((e) => e.id === id);
+											if (index > -1) {
+												employees.splice(index, 1);
+												employees = employees;
+											}
+										}
+
 										loading = true;
 										return async ({ update }) => {
 											await update({ reset: false });

@@ -4,7 +4,7 @@
 
 	let { data }: PageProps = $props();
 
-	let allEmployees = $derived(data.employees || []);
+	let allEmployees = $state(data.employees || []);
 	let search = $state('');
 
 	let archivedEmployees = $derived(
@@ -83,7 +83,16 @@
 							class="items-center flex"
 							method="POST"
 							action="?/reinstateEmployee&id={employee.id}"
-							use:enhance={() => {
+							use:enhance={({ formElement }) => {
+								const url = new URL(formElement.action);
+								const id = url.searchParams.get('id');
+								if (id) {
+									const index = allEmployees.findIndex((e) => e.id === id);
+									if (index > -1) {
+										allEmployees.splice(index, 1);
+										allEmployees = allEmployees;
+									}
+								}
 								return async ({ update }) => {
 									await update({ reset: false });
 								};
