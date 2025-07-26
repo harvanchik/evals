@@ -21,7 +21,7 @@
 </script>
 
 <svelte:head>
-	<link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 </svelte:head>
 
 <div class="flex flex-col min-h-screen bg-gray-50">
