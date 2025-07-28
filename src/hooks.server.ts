@@ -34,6 +34,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 				event.locals.user = user as UsersRecord;
 				event.locals.orgCode = orgCode;
 
+				let isAdmin = false;
+				if (orgCode) {
+					const organization =
+						await xata.sql`SELECT admin FROM "organization" WHERE "code" = ${orgCode} LIMIT 1`;
+					console.log(organization.records[0]?.admin);
+					if (organization && organization.records[0]?.admin === user.username) {
+						isAdmin = true;
+					}
+				}
+				// if no org code, then the user is an admin
+				else {
+					isAdmin = true;
+				}
+
 				if (event.url.pathname === '/login') {
 					redirect(303, '/');
 				}
