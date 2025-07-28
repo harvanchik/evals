@@ -24,6 +24,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	createTag: async ({ request, locals }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const formData = await request.formData();
 		const name = formData.get('name') as string;
 		const description = formData.get('description') as string;
@@ -52,6 +55,9 @@ export const actions: Actions = {
 		};
 	},
 	updateTag: async ({ request, locals, url }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const { user } = locals;
 		if (!user) {
 			return fail(401, { message: 'Unauthorized' });
@@ -82,6 +88,9 @@ export const actions: Actions = {
 		};
 	},
 	deleteTag: async ({ locals, url }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const { user } = locals;
 		if (!user) {
 			return fail(401, { message: 'Unauthorized' });

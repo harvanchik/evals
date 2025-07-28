@@ -45,6 +45,9 @@ export const load: PageServerLoad = async ({ locals, parent }) => {
 
 export const actions: Actions = {
 	createEmployee: async ({ request, locals }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const formData = await request.formData();
 		const firstName = formData.get('first_name') as string;
 		const lastName = formData.get('last_name') as string;
@@ -75,6 +78,9 @@ export const actions: Actions = {
 		};
 	},
 	updateEmployee: async ({ request, locals, url }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const { user } = locals;
 		if (!user) {
 			return fail(401, { message: 'Unauthorized' });
@@ -107,6 +113,9 @@ export const actions: Actions = {
 		};
 	},
 	archiveEmployee: async ({ locals, url }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const { user } = locals;
 		if (!user) {
 			return fail(401, { message: 'Unauthorized' });
@@ -126,6 +135,9 @@ export const actions: Actions = {
 		};
 	},
 	restoreEmployee: async ({ locals, url }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
 		const { user } = locals;
 		if (!user) {
 			return fail(401, { message: 'Unauthorized' });
