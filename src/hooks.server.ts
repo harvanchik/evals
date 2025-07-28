@@ -36,10 +36,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 				let isAdmin = false;
 				if (orgCode) {
-					const organization =
+					const organization: any =
 						await xata.sql`SELECT admin FROM "organization" WHERE "code" = ${orgCode} LIMIT 1`;
-					console.log(organization.records[0]?.admin);
-					if (organization && organization.records[0]?.admin === user.username) {
+					// get the admin from the organization
+					const admin = organization.records[0]?.admin;
+					// if the admin is the user, then the user is an admin
+					if (admin === user.username) {
 						isAdmin = true;
 					}
 				}
@@ -47,6 +49,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 				else {
 					isAdmin = true;
 				}
+				// set the isAdmin flag
+				event.locals.isAdmin = isAdmin;
 
 				if (event.url.pathname === '/login') {
 					redirect(303, '/');

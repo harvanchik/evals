@@ -62,95 +62,97 @@
 	<h1 class="text-2xl font-bold text-gray-800">Manage Tags</h1>
 
 	<div class="grid md:grid-cols-2 gap-8 mt-4">
-		<div>
-			<div
-				class="flex items-center mb-2 cursor-pointer md:cursor-auto"
-				onclick={() => (mobileFormVisible = !mobileFormVisible)}
-				onkeypress={() => (mobileFormVisible = !mobileFormVisible)}
-				role="button"
-				tabindex="0"
-			>
-				<h2 class="text-xl font-semibold text-gray-700">
-					{#if formState.id}Edit Tag{:else}Add New Tag{/if}
-				</h2>
-				<span class="md:hidden ml-2">
-					{#if mobileFormVisible || formState.id}
-						<Minus />
-					{:else}
-						<Plus />
-					{/if}
-				</span>
-			</div>
-			<form
-				method="POST"
-				action={formState.id ? `?/updateTag&id=${formState.id}` : '?/createTag'}
-				use:enhance={() => {
-					loading = true;
-					return async ({ result, update }) => {
-						if (result.type === 'success') {
-							handleReset();
-						}
-						await update({ reset: false });
-						loading = false;
-					};
-				}}
-				class:hidden={!mobileFormVisible && !formState.id}
-				class="md:block space-y-4 p-4 border rounded"
-			>
-				<label class="block">
-					<span class="text-gray-700">Name</span>
-					<input
-						type="text"
-						name="name"
-						bind:value={formState.name}
-						class="w-full p-2 border rounded"
-						required
-					/>
-				</label>
-				<label class="block">
-					<span class="text-gray-700">Description (Optional)</span>
-					<textarea
-						name="description"
-						bind:value={formState.description}
-						class="w-full p-2 border rounded"
-						rows="3"
-					></textarea>
-				</label>
-				<label class="block">
-					<span class="text-gray-700">Color</span>
-					<ColorInput bind:value={formState.color} />
-				</label>
-				<input type="hidden" name="color" value={formState.color} />
-				<div class="flex items-center space-x-2">
-					<button
-						type="submit"
-						class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-36 h-10 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
-						disabled={loading}
-					>
-						{#if loading}
-							<Spinner />
-						{:else if formState.id}
-							Save Changes
+		{#if data.isAdmin}
+			<div>
+				<div
+					class="flex items-center mb-2 cursor-pointer md:cursor-auto"
+					onclick={() => (mobileFormVisible = !mobileFormVisible)}
+					onkeypress={() => (mobileFormVisible = !mobileFormVisible)}
+					role="button"
+					tabindex="0"
+				>
+					<h2 class="text-xl font-semibold text-gray-700">
+						{#if formState.id}Edit Tag{:else}Add New Tag{/if}
+					</h2>
+					<span class="md:hidden ml-2">
+						{#if mobileFormVisible || formState.id}
+							<Minus />
 						{:else}
-							Add Tag
+							<Plus />
 						{/if}
-					</button>
-					{#if formState.id}
-						<button
-							type="button"
-							onclick={handleReset}
-							class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 cursor-pointer"
-						>
-							Cancel
-						</button>
-					{/if}
+					</span>
 				</div>
-				{#if form?.error}
-					<p class="text-red-500">{form.error}</p>
-				{/if}
-			</form>
-		</div>
-		<div>
+				<form
+					method="POST"
+					action={formState.id ? `?/updateTag&id=${formState.id}` : '?/createTag'}
+					use:enhance={() => {
+						loading = true;
+						return async ({ result, update }) => {
+							if (result.type === 'success') {
+								handleReset();
+							}
+							await update({ reset: false });
+							loading = false;
+						};
+					}}
+					class:hidden={!mobileFormVisible && !formState.id}
+					class="md:block space-y-4 p-4 border rounded"
+				>
+					<label class="block">
+						<span class="text-gray-700">Name</span>
+						<input
+							type="text"
+							name="name"
+							bind:value={formState.name}
+							class="w-full p-2 border rounded"
+							required
+						/>
+					</label>
+					<label class="block">
+						<span class="text-gray-700">Description (Optional)</span>
+						<textarea
+							name="description"
+							bind:value={formState.description}
+							class="w-full p-2 border rounded"
+							rows="3"
+						></textarea>
+					</label>
+					<label class="block">
+						<span class="text-gray-700">Color</span>
+						<ColorInput bind:value={formState.color} />
+					</label>
+					<input type="hidden" name="color" value={formState.color} />
+					<div class="flex items-center space-x-2">
+						<button
+							type="submit"
+							class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-36 h-10 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
+							disabled={loading}
+						>
+							{#if loading}
+								<Spinner />
+							{:else if formState.id}
+								Save Changes
+							{:else}
+								Add Tag
+							{/if}
+						</button>
+						{#if formState.id}
+							<button
+								type="button"
+								onclick={handleReset}
+								class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 cursor-pointer"
+							>
+								Cancel
+							</button>
+						{/if}
+					</div>
+					{#if form?.error}
+						<p class="text-red-500">{form.error}</p>
+					{/if}
+				</form>
+			</div>
+		{/if}
+		<div class:md:col-span-2={!data.isAdmin}>
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-700">Tags</h2>
 				<input
@@ -171,39 +173,41 @@
 								<p class="font-bold">{tag.name}</p>
 								<p class="text-sm text-gray-600">{tag.description}</p>
 							</div>
-							<div class="flex items-center space-x-3">
-								<button
-									onclick={() => startEditing(tag)}
-									class="text-gray-500 hover:text-blue-600 cursor-pointer"
-									aria-label="Edit tag"
-								>
-									<Pencil class="w-5 h-5" />
-								</button>
-								<form
-									class="items-center flex"
-									method="POST"
-									action="?/deleteTag&id={tag.id}"
-									use:enhance={({ cancel }) => {
-										if (!confirm('Are you sure you want to delete this tag?')) {
-											cancel();
-										}
-										loading = true;
-										return async ({ update }) => {
-											await update({ reset: false });
-											loading = false;
-										};
-									}}
-								>
+							{#if data.isAdmin}
+								<div class="flex items-center space-x-3">
 									<button
-										type="submit"
-										class="text-gray-500 hover:text-red-600 cursor-pointer disabled:cursor-not-allowed"
-										aria-label="Delete tag"
-										disabled={loading}
+										onclick={() => startEditing(tag)}
+										class="text-gray-500 hover:text-blue-600 cursor-pointer"
+										aria-label="Edit tag"
 									>
-										<Trash2 class="w-5 h-5" />
+										<Pencil class="w-5 h-5" />
 									</button>
-								</form>
-							</div>
+									<form
+										class="items-center flex"
+										method="POST"
+										action="?/deleteTag&id={tag.id}"
+										use:enhance={({ cancel }) => {
+											if (!confirm('Are you sure you want to delete this tag?')) {
+												cancel();
+											}
+											loading = true;
+											return async ({ update }) => {
+												await update({ reset: false });
+												loading = false;
+											};
+										}}
+									>
+										<button
+											type="submit"
+											class="text-gray-500 hover:text-red-600 cursor-pointer disabled:cursor-not-allowed"
+											aria-label="Delete tag"
+											disabled={loading}
+										>
+											<Trash2 class="w-5 h-5" />
+										</button>
+									</form>
+								</div>
+							{/if}
 						</li>
 					{/each}
 				</ul>

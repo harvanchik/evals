@@ -42,6 +42,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
 	return {
 		user: locals.user,
+		isAdmin: locals.isAdmin,
 		employees: employees.map((e) => e.toSerializable()),
 		positions: positions.map((p) => p.toSerializable()),
 		tags: tags.map((t) => t.toSerializable())

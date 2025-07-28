@@ -22,11 +22,11 @@
 		(data.positions || []).reduce(
 			(acc, pos) => {
 				if (pos.title) {
-					acc[pos.title] = pos.color;
+					acc[pos.title] = pos.color as string;
 				}
 				return acc;
 			},
-			{} as Record<string, string | null | undefined>
+			{} as Record<string, string>
 		)
 	);
 
@@ -80,33 +80,35 @@
 						>
 							<Eye class="w-5 h-5" />
 						</a>
-						<form
-							class="items-center flex"
-							method="POST"
-							action="?/reinstateEmployee&id={employee.id}"
-							use:enhance={({ formElement }) => {
-								const url = new URL(formElement.action);
-								const id = url.searchParams.get('id');
-								if (id) {
-									const index = allEmployees.findIndex((e) => e.id === id);
-									if (index > -1) {
-										allEmployees.splice(index, 1);
-										allEmployees = allEmployees;
+						{#if data.isAdmin}
+							<form
+								class="items-center flex"
+								method="POST"
+								action="?/reinstateEmployee&id={employee.id}"
+								use:enhance={({ formElement }) => {
+									const url = new URL(formElement.action);
+									const id = url.searchParams.get('id');
+									if (id) {
+										const index = allEmployees.findIndex((e) => e.id === id);
+										if (index > -1) {
+											allEmployees.splice(index, 1);
+											allEmployees = allEmployees;
+										}
 									}
-								}
-								return async ({ update }) => {
-									await update({ reset: false });
-								};
-							}}
-						>
-							<button
-								type="submit"
-								class="text-gray-500 hover:text-green-600 cursor-pointer"
-								aria-label="Reinstate employee"
+									return async ({ update }) => {
+										await update({ reset: false });
+									};
+								}}
 							>
-								<ArchiveRestore class="w-5 h-5" />
-							</button>
-						</form>
+								<button
+									type="submit"
+									class="text-gray-500 hover:text-green-600 cursor-pointer"
+									aria-label="Reinstate employee"
+								>
+									<ArchiveRestore class="w-5 h-5" />
+								</button>
+							</form>
+						{/if}
 					</div>
 				</li>
 			{/each}

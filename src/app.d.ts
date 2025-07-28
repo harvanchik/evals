@@ -6,6 +6,7 @@ declare global {
 		interface Locals {
 			user: import('./xata').UsersRecord | null;
 			orgCode: string | null;
+			isAdmin: boolean;
 		}
 		// interface PageData {}
 		// interface Platform {}
