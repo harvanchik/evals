@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { LogOut, User, LayoutDashboard, Users, Briefcase, Tags } from 'lucide-svelte';
+	import { User, LayoutDashboard, Users, Briefcase, Tags } from 'lucide-svelte';
 	import type { UsersRecord } from '../../xata';
 
 	let { user }: { user: UsersRecord | null } = $props();
@@ -44,9 +44,6 @@
 									<User class="text-gray-500 scale-80" />
 								</div>
 								<span class="text-sm font-medium text-gray-700">{user.username}</span>
-							</a>
-							<a href="/logout" class="text-gray-500 hover:text-red-600 w-full scale-80">
-								<LogOut />
 							</a>
 						</div>
 					{/if}
@@ -109,25 +106,5 @@
 			<Tags class="w-5 h-5" />
 			<span class="text-xs mt-1">Tags</span>
 		</a>
-		{#if user}
-			<a
-				href="/profile"
-				class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
-				aria-label="Profile"
-			>
-				<User class="w-5 h-5" />
-				<span class="text-xs mt-1">Profile</span>
-			</a>
-			<form action="/logout" method="POST" class="flex flex-col items-center">
-				<button
-					type="submit"
-					class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
-					aria-label="Logout"
-				>
-					<LogOut class="w-5 h-5" />
-					<span class="text-xs mt-1">Logout</span>
-				</button>
-			</form>
-		{/if}
 	</div>
 </nav>
