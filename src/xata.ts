@@ -701,6 +701,22 @@ const tables = [
 		},
 		columns: [
 			{
+				name: 'first_name',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
+				name: 'last_name',
+				type: 'text',
+				notNull: false,
+				unique: false,
+				defaultValue: null,
+				comment: ''
+			},
+			{
 				name: 'org',
 				type: 'link',
 				link: { table: 'organization' },

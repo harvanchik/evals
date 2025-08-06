@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { LogOut, User, LayoutDashboard, Users, Briefcase, Tags } from 'lucide-svelte';
 	import type { UsersRecord } from '../../xata';
 
 	let { user }: { user: UsersRecord | null } = $props();
-	let mobileMenuOpen = $state(false);
 
 	const navLinks = [
 		{ href: '/', label: 'Dashboard' },
@@ -28,10 +27,10 @@
 							<a
 								href={link.href}
 								class="px-3 py-2 rounded-md text-sm font-medium"
-								class:text-blue-600={$page.url.pathname === link.href}
-								class:bg-blue-50={$page.url.pathname === link.href}
-								class:text-gray-600={$page.url.pathname !== link.href}
-								class:hover:bg-gray-100={$page.url.pathname !== link.href}
+								class:text-blue-600={page.url.pathname === link.href}
+								class:bg-blue-50={page.url.pathname === link.href}
+								class:text-gray-600={page.url.pathname !== link.href}
+								class:hover:bg-gray-100={page.url.pathname !== link.href}
 							>
 								{link.label}
 							</a>
@@ -40,12 +39,12 @@
 					{#if user}
 						<div class="flex items-center space-x-4">
 							<div class="w-px h-6 bg-gray-300"></div>
-							<div class="flex items-center space-x-2">
+							<a href="/profile" class="flex items-center space-x-2 cursor-pointer">
 								<div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
 									<User class="text-gray-500 scale-80" />
 								</div>
 								<span class="text-sm font-medium text-gray-700">{user.username}</span>
-							</div>
+							</a>
 							<a href="/logout" class="text-gray-500 hover:text-red-600 w-full scale-80">
 								<LogOut />
 							</a>
@@ -60,12 +59,12 @@
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 				</div>
 				{#if user}
-					<div class="flex items-center space-x-2">
+					<a href="/profile" class="flex items-center space-x-2 cursor-pointer">
 						<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
 							<User class="text-gray-500" />
 						</div>
 						<span class="text-sm font-medium text-gray-700">{user.username}</span>
-					</div>
+					</a>
 				{/if}
 			</div>
 			<!-- END: Mobile Header -->
@@ -111,6 +110,14 @@
 			<span class="text-xs mt-1">Tags</span>
 		</a>
 		{#if user}
+			<a
+				href="/profile"
+				class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+				aria-label="Profile"
+			>
+				<User class="w-5 h-5" />
+				<span class="text-xs mt-1">Profile</span>
+			</a>
 			<form action="/logout" method="POST" class="flex flex-col items-center">
 				<button
 					type="submit"
