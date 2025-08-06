@@ -76,7 +76,7 @@
 	<div class="flex justify-around items-center h-18">
 		<a
 			href="/"
-			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			class="flex-1 flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Dashboard"
 		>
 			<LayoutDashboard class="w-5 h-5" />
@@ -84,7 +84,7 @@
 		</a>
 		<a
 			href="/employees"
-			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			class="flex-1 flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Employees"
 		>
 			<Users class="w-5 h-5" />
@@ -92,7 +92,7 @@
 		</a>
 		<a
 			href="/positions"
-			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			class="flex-1 flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Positions"
 		>
 			<Briefcase class="w-5 h-5" />
@@ -100,7 +100,7 @@
 		</a>
 		<a
 			href="/tags"
-			class="flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
+			class="flex-1 flex flex-col items-center text-center hover:bg-gray-200 p-2 rounded-lg text-sm"
 			aria-label="Tags"
 		>
 			<Tags class="w-5 h-5" />
