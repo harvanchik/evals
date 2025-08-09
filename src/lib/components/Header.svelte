@@ -1,9 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { User, LayoutDashboard, Users, Briefcase, Tags } from 'lucide-svelte';
-	import type { UsersRecord } from '../../xata';
+	import type { UsersRecord, EmployeesRecord } from '../../xata';
+	import EmployeeSearch from './EmployeeSearch.svelte';
 
-	let { user }: { user: UsersRecord | null } = $props();
+	let {
+		user,
+		employees = []
+	}: {
+		user: UsersRecord | null;
+		employees?: any[];
+	} = $props();
 
 	const navLinks = [
 		{ href: '/', label: 'Dashboard' },
@@ -18,8 +25,13 @@
 		<div class="flex items-center justify-between h-16">
 			<!-- Desktop Header -->
 			<div class="hidden md:flex items-center justify-between w-full">
-				<div class="flex items-center space-x-2">
+				<div class="flex items-center space-x-4">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
+					{#if user && employees.length > 0}
+						<div class="w-80">
+							<EmployeeSearch {employees} />
+						</div>
+					{/if}
 				</div>
 				<div class="flex items-center space-x-2">
 					<nav class="flex items-center space-x-2">

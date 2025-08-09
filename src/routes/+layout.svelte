@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Header from '$lib/components/Header.svelte';
 	import type { LayoutProps } from './$types';
-	import { navigating, page } from '$app/stores';
+	import { navigating, page } from '$app/state';
 	import NProgress from 'nprogress';
 	import 'nprogress/nprogress.css';
 	let { children, data }: LayoutProps = $props();
@@ -10,19 +10,19 @@
 	NProgress.configure({ minimum: 0.16, showSpinner: false });
 
 	$effect(() => {
-		if ($navigating) {
+		if (navigating) {
 			NProgress.start();
 		} else {
 			NProgress.done();
 		}
 	});
 
-	let isLoginPage = $derived($page.url.pathname === '/login');
+	let isLoginPage = $derived(page.url.pathname === '/login');
 </script>
 
 <div class="flex flex-col min-h-screen bg-gray-50">
 	{#if !isLoginPage}
-		<Header user={data.user} />
+		<Header user={data.user} employees={data.employees || []} />
 	{/if}
 
 	<main
