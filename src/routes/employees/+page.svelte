@@ -608,7 +608,7 @@
 				</div>
 			</div>
 			{#if sortAndFilter(employees, sortKey, sortDirection, search, selectedPositions).length}
-				<ul class="space-y-2">
+				<ul class="space-y-2 mb-3">
 					{#each sortAndFilter(employees, sortKey, sortDirection, search, selectedPositions) as employee (employee.id)}
 						<li
 							class="p-4 rounded-lg shadow flex justify-between items-center"
