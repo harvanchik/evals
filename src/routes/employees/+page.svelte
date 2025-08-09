@@ -15,6 +15,11 @@
 	let selectedPositions = $state<string[]>([]);
 	let showPositionFilter = $state(false);
 
+	// Bulk edit state
+	let bulkEditMode = $state(false);
+	let selectedEmployees = $state<string[]>([]);
+	let bulkEditPosition = $state('');
+
 	$effect(() => {
 		const savedSortKey = localStorage.getItem('employees_sortKey');
 		if (savedSortKey) {
@@ -104,6 +109,40 @@
 		formState.nickname = employee.nickname ?? '';
 		formState.position = employee.position ?? '';
 		mobileFormVisible = true;
+	}
+
+	// Bulk edit functions
+	function toggleBulkEditMode() {
+		bulkEditMode = !bulkEditMode;
+		if (!bulkEditMode) {
+			selectedEmployees = [];
+			bulkEditPosition = '';
+		}
+	}
+
+	function toggleEmployeeSelection(employeeId: string) {
+		const index = selectedEmployees.indexOf(employeeId);
+		if (index > -1) {
+			selectedEmployees.splice(index, 1);
+		} else {
+			selectedEmployees.push(employeeId);
+		}
+		selectedEmployees = selectedEmployees;
+	}
+
+	function selectAllEmployees() {
+		const filteredEmp = sortAndFilter(employees, sortKey, sortDirection, search, selectedPositions);
+		selectedEmployees = filteredEmp.map((emp) => emp.id);
+	}
+
+	function clearAllEmployees() {
+		selectedEmployees = [];
+	}
+
+	function cancelBulkEdit() {
+		bulkEditMode = false;
+		selectedEmployees = [];
+		bulkEditPosition = '';
 	}
 
 	$effect(() => {
@@ -202,11 +241,105 @@
 <div>
 	<div class="flex justify-between items-center mb-4">
 		<h1 class="text-2xl font-bold text-gray-800">Employees</h1>
-		<a href="/employees/archived" class="text-sm text-blue-500 hover:underline">View Archived</a>
+		<div class="flex items-center gap-3">
+			{#if data.isAdmin}
+				<button
+					onclick={toggleBulkEditMode}
+					class="px-3 py-1 text-sm rounded-md cursor-pointer"
+					class:bg-blue-600={bulkEditMode}
+					class:text-white={bulkEditMode}
+					class:bg-gray-200={!bulkEditMode}
+					class:text-gray-700={!bulkEditMode}
+				>
+					{bulkEditMode ? 'Exit Bulk Edit' : 'Bulk Edit'}
+				</button>
+			{/if}
+			<a href="/employees/archived" class="text-sm text-blue-500 hover:underline">View Archived</a>
+		</div>
 	</div>
 
+	<!-- Bulk Edit Form -->
+	{#if bulkEditMode && data.isAdmin}
+		<div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+			<h3 class="text-lg font-semibold text-blue-800 mb-4">Bulk Edit Positions</h3>
+			<div class="flex flex-col md:flex-row gap-4 items-end">
+				<div class="flex-grow">
+					<label class="block">
+						<span class="text-sm font-medium text-gray-700">New Position</span>
+						<select
+							bind:value={bulkEditPosition}
+							class="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+						>
+							<option value="">Select a position</option>
+							{#each positions as position (position.id)}
+								<option value={position.title}>{position.title}</option>
+							{/each}
+						</select>
+					</label>
+				</div>
+				<div class="flex gap-2">
+					<form
+						method="POST"
+						action="?/bulkUpdatePositions"
+						use:enhance={() => {
+							loading = true;
+							return async ({ result, update }) => {
+								await update({ reset: false });
+								if (result.type === 'success') {
+									// Update local employees data
+									selectedEmployees.forEach((employeeId) => {
+										const employee = employees.find((e) => e.id === employeeId);
+										if (employee) {
+											employee.position = bulkEditPosition;
+										}
+									});
+									employees = employees;
+									cancelBulkEdit();
+								}
+								loading = false;
+							};
+						}}
+					>
+						{#each selectedEmployees as employeeId}
+							<input type="hidden" name="employeeIds" value={employeeId} />
+						{/each}
+						<input type="hidden" name="position" value={bulkEditPosition} />
+						<button
+							type="submit"
+							disabled={loading || selectedEmployees.length === 0 || !bulkEditPosition}
+							class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+						>
+							{#if loading}
+								<Spinner />
+							{:else}
+								Update {selectedEmployees.length} Employee{selectedEmployees.length !== 1
+									? 's'
+									: ''}
+							{/if}
+						</button>
+					</form>
+					<button
+						onclick={cancelBulkEdit}
+						class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 cursor-pointer"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+			{#if selectedEmployees.length > 0}
+				<div class="mt-3 text-sm text-blue-700">
+					{selectedEmployees.length} employee{selectedEmployees.length !== 1 ? 's' : ''} selected
+				</div>
+			{:else}
+				<div class="mt-3 text-sm text-gray-600">
+					Select employees below to bulk edit their positions
+				</div>
+			{/if}
+		</div>
+	{/if}
+
 	<div class="grid md:grid-cols-2 gap-8 mt-4">
-		{#if data.isAdmin}
+		{#if data.isAdmin && !bulkEditMode}
 			<div>
 				<div
 					class="flex items-center mb-2 cursor-pointer md:cursor-auto"
@@ -322,9 +455,26 @@
 				</form>
 			</div>
 		{/if}
-		<div class:md:col-span-2={!data.isAdmin}>
+		<div class:md:col-span-2={!data.isAdmin && !bulkEditMode}>
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-700">Employees</h2>
+				{#if bulkEditMode}
+					<div class="flex gap-2 text-sm">
+						<button
+							onclick={selectAllEmployees}
+							class="text-blue-500 hover:underline cursor-pointer"
+						>
+							Select All
+						</button>
+						<span class="text-gray-400">|</span>
+						<button
+							onclick={clearAllEmployees}
+							class="text-blue-500 hover:underline cursor-pointer"
+						>
+							Select None
+						</button>
+					</div>
+				{/if}
 			</div>
 			<div class="flex flex-col gap-4 mb-4">
 				<div class="flex-grow">
@@ -466,7 +616,21 @@
 								positionColorMap[employee.position]) ||
 								'#cccccc'}"
 						>
-							<a href="/employees/{employee.id}" class="flex-grow">
+							{#if bulkEditMode}
+								<label class="flex items-center mr-3">
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-blue-600"
+										checked={selectedEmployees.includes(employee.id)}
+										onchange={() => toggleEmployeeSelection(employee.id)}
+									/>
+								</label>
+							{/if}
+							<a
+								href="/employees/{employee.id}"
+								class="flex-grow"
+								class:pointer-events-none={bulkEditMode}
+							>
 								<div>
 									<p class="font-bold flex items-center gap-1">
 										{employee.nickname || employee.first_name}
@@ -485,7 +649,7 @@
 									<p class="text-sm text-gray-600">{employee.position}</p>
 								</div>
 							</a>
-							{#if data.isAdmin}
+							{#if data.isAdmin && !bulkEditMode}
 								<div class="flex items-center space-x-3">
 									<button
 										onclick={() => startEditing(employee)}

@@ -155,5 +155,41 @@ export const actions: Actions = {
 		return {
 			restoredEmployee
 		};
+	},
+	bulkUpdatePositions: async ({ request, locals }) => {
+		if (!locals.isAdmin) {
+			return fail(401, { message: 'Unauthorized' });
+		}
+		const { user } = locals;
+		if (!user) {
+			return fail(401, { message: 'Unauthorized' });
+		}
+
+		const formData = await request.formData();
+		const employeeIds = formData.getAll('employeeIds') as string[];
+		const position = formData.get('position') as string;
+
+		if (!employeeIds.length) {
+			return fail(400, { error: 'No employees selected' });
+		}
+
+		if (!position) {
+			return fail(400, { error: 'Position is required' });
+		}
+
+		try {
+			// Update all selected employees
+			const updatePromises = employeeIds.map((id) => xata.db.employees.update(id, { position }));
+
+			await Promise.all(updatePromises);
+
+			return {
+				success: true,
+				updatedCount: employeeIds.length
+			};
+		} catch (error) {
+			console.error('Bulk update error:', error);
+			return fail(500, { error: 'Failed to update employees' });
+		}
 	}
 };

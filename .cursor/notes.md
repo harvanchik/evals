@@ -5,3 +5,5 @@
 - filter ability on employee's page to search text and filter by tags; filter by which user wrote an entry
 - show "no entries yet" message on employees page
 - bulk edit feature to change multiple employee positions at once
+
+- upgrade dependencies
