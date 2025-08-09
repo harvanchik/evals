@@ -29,7 +29,21 @@
 	});
 
 	let isLoginPage = $derived($page.url.pathname === '/login');
+
+	// Global hotkey handler for Ctrl+K search
+	function handleGlobalKeydown(event: KeyboardEvent) {
+		// Only handle Ctrl+K (or Cmd+K on Mac) and not on login page
+		if ((event.ctrlKey || event.metaKey) && event.key === 'k' && !isLoginPage) {
+			event.preventDefault();
+
+			// Dispatch custom event to focus search
+			const searchEvent = new CustomEvent('focus-search');
+			window.dispatchEvent(searchEvent);
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <div class="flex flex-col min-h-screen bg-gray-50">
 	{#if !isLoginPage}

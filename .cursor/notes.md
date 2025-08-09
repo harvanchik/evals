@@ -4,5 +4,3 @@
 - redesign for employee's page and how entries are displayed.
 - filter ability on employee's page to search text and filter by tags; filter by which user wrote an entry
 - show "no entries yet" message on employees page
-
-- upgrade dependencies

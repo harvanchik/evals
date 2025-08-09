@@ -28,7 +28,7 @@
 				<div class="flex items-center space-x-4">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 					{#if user && employees.length > 0}
-						<div class="w-60 xl:w-96">
+						<div class="w-60 lg:w-96">
 							<EmployeeSearch {employees} />
 						</div>
 					{/if}

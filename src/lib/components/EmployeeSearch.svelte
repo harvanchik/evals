@@ -105,6 +105,29 @@
 			showDropdown = false;
 		}
 	}
+
+	// Listen for global search focus event
+	function handleFocusSearch() {
+		searchInput?.focus();
+		searchInput?.select(); // Select all text for easy replacement
+		showDropdown = searchTerm.trim().length > 0 && filteredEmployees.length > 0;
+	}
+
+	// Add event listener for the custom focus-search event
+	$effect(() => {
+		window.addEventListener('focus-search', handleFocusSearch);
+		return () => {
+			window.removeEventListener('focus-search', handleFocusSearch);
+		};
+	});
+
+	// Detect platform for hotkey display
+	let isMac = $state(false);
+	$effect(() => {
+		if (typeof navigator !== 'undefined') {
+			isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+		}
+	});
 </script>
 
 <svelte:window onclick={handleClickOutside} />
@@ -121,8 +144,16 @@
 			onkeydown={handleKeydown}
 			type="text"
 			placeholder="Search employees..."
-			class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+			class="block w-full pl-10 pr-3 md:pr-16 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 		/>
+		<!-- Ctrl+K / Cmd+K indicator -->
+		<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+			<kbd
+				class="hidden md:inline-flex items-center px-2 py-0.5 text-xs font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded"
+			>
+				{isMac ? '⌘K' : 'Ctrl+K'}
+			</kbd>
+		</div>
 	</div>
 
 	{#if showDropdown}
