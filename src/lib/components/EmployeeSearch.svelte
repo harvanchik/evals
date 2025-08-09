@@ -90,10 +90,13 @@
 	}
 
 	function navigateToEmployee(employee: any) {
-		goto(`/employees/${employee.id}`);
+		// Clear search state first
 		searchTerm = '';
 		showDropdown = false;
 		searchInput?.blur();
+
+		// Navigate to employee page
+		goto(`/employees/${employee.id}`);
 	}
 
 	function handleClickOutside(event: MouseEvent) {
@@ -114,6 +117,7 @@
 		<input
 			bind:this={searchInput}
 			bind:value={searchTerm}
+			onfocus={() => (showDropdown = searchTerm.trim().length > 0 && filteredEmployees.length > 0)}
 			onkeydown={handleKeydown}
 			type="text"
 			placeholder="Search employees..."

@@ -3,4 +3,5 @@
 - export feature to get all entries for an employee in txt file. export would show the employee name at the top, position, and list out all entries in chronological order (earliest at the top to most recent at the bottom) with the rating given, the tags assigned, and the date it was written and modified. past edits would not show
 - redesign for employee's page and how entries are displayed.
 - filter ability on employee's page to search text and filter by tags; filter by which user wrote an entry
-- on desktop, add a search bar right of the site logo to search for an employee and easily navigate straight to that employee's page.  don't search using the database.  search against all the employees that were fetched at the login (or last time they were fetched).
+- show "no entries yet" message on employees page
+- bulk edit feature to change multiple employee positions at once

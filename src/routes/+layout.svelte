@@ -5,7 +5,15 @@
 	import { navigating, page } from '$app/stores';
 	import NProgress from 'nprogress';
 	import 'nprogress/nprogress.css';
+	import { positions } from '$lib/stores/positions';
 	let { children, data }: LayoutProps = $props();
+
+	// Update positions store when data changes
+	$effect(() => {
+		if (data.positions) {
+			positions.set(data.positions);
+		}
+	});
 
 	NProgress.configure({
 		// Full list: https://github.com/rstacruz/nprogress#configuration

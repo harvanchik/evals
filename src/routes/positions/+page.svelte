@@ -4,6 +4,8 @@
 	import ColorInput from '$lib/components/ColorInput.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { Plus, Minus, Pencil, Trash2 } from 'lucide-svelte';
+	import { positions as positionsStore } from '$lib/stores/positions';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data, form }: PageProps = $props();
 	let positions = $derived(data.positions || []);
@@ -90,6 +92,8 @@
 						return async ({ result, update }) => {
 							if (result.type === 'success') {
 								handleReset();
+								// Invalidate all data to refresh positions in layout
+								await invalidateAll();
 							}
 							await update({ reset: false });
 							loading = false;
@@ -192,7 +196,11 @@
 												cancel();
 											}
 											loading = true;
-											return async ({ update }) => {
+											return async ({ result, update }) => {
+												if (result.type === 'success') {
+													// Invalidate all data to refresh positions in layout
+													await invalidateAll();
+												}
 												await update({ reset: false });
 												loading = false;
 											};
