@@ -8,7 +8,8 @@
 	let searchTerm = $state('');
 	let showDropdown = $state(false);
 	let selectedIndex = $state(0);
-	let searchInput: HTMLInputElement;
+	let searchInput: HTMLInputElement | undefined = $state();
+	let dropdownContainer: HTMLDivElement | undefined = $state();
 
 	// Filter employees based on search term
 	let filteredEmployees = $derived.by(() => {
@@ -24,7 +25,7 @@
 				const nickname = (emp.nickname || '').toLowerCase();
 				return fullName.includes(term) || nickname.includes(term);
 			})
-			.slice(0, 5); // Limit to 5 results
+			.slice(0, 10); // Limit to 10 results
 	});
 
 	// Show dropdown when there are results and search term exists
@@ -33,6 +34,21 @@
 		selectedIndex = 0; // Reset selection when results change
 	});
 
+	// Auto-scroll to keep selected item in view
+	function scrollToSelectedItem() {
+		if (!dropdownContainer) return;
+
+		const selectedButton = dropdownContainer.querySelector(
+			`[data-index="${selectedIndex}"]`
+		) as HTMLElement;
+		if (selectedButton) {
+			selectedButton.scrollIntoView({
+				behavior: 'smooth',
+				block: 'nearest'
+			});
+		}
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (!showDropdown) return;
 
@@ -40,10 +56,24 @@
 			case 'ArrowDown':
 				event.preventDefault();
 				selectedIndex = Math.min(selectedIndex + 1, filteredEmployees.length - 1);
+				scrollToSelectedItem();
 				break;
 			case 'ArrowUp':
 				event.preventDefault();
 				selectedIndex = Math.max(selectedIndex - 1, 0);
+				scrollToSelectedItem();
+				break;
+			case 'Tab':
+				event.preventDefault();
+				// Tab cycles through the dropdown, wrapping around to the beginning
+				if (event.shiftKey) {
+					// Shift+Tab goes backwards
+					selectedIndex = selectedIndex <= 0 ? filteredEmployees.length - 1 : selectedIndex - 1;
+				} else {
+					// Tab goes forwards
+					selectedIndex = selectedIndex >= filteredEmployees.length - 1 ? 0 : selectedIndex + 1;
+				}
+				scrollToSelectedItem();
 				break;
 			case 'Enter':
 				event.preventDefault();
@@ -54,7 +84,7 @@
 			case 'Escape':
 				searchTerm = '';
 				showDropdown = false;
-				searchInput.blur();
+				searchInput?.blur();
 				break;
 		}
 	}
@@ -63,7 +93,7 @@
 		goto(`/employees/${employee.id}`);
 		searchTerm = '';
 		showDropdown = false;
-		searchInput.blur();
+		searchInput?.blur();
 	}
 
 	function handleClickOutside(event: MouseEvent) {
@@ -93,11 +123,13 @@
 
 	{#if showDropdown}
 		<div
-			class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+			bind:this={dropdownContainer}
+			class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-40 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
 		>
 			{#each filteredEmployees as employee, index (employee.id)}
 				<button
 					type="button"
+					data-index={index}
 					onclick={() => navigateToEmployee(employee)}
 					class="w-full text-left relative py-2 pl-3 pr-9 hover:bg-gray-100 cursor-pointer"
 					class:bg-blue-100={index === selectedIndex}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { User, LayoutDashboard, Users, Briefcase, Tags } from 'lucide-svelte';
-	import type { UsersRecord, EmployeesRecord } from '../../xata';
+	import type { UsersRecord } from '../../xata';
 	import EmployeeSearch from './EmployeeSearch.svelte';
 
 	let {
@@ -28,7 +28,7 @@
 				<div class="flex items-center space-x-4">
 					<img src="/favicon.png" alt="EPT Logo" class="h-9 w-9" />
 					{#if user && employees.length > 0}
-						<div class="w-80">
+						<div class="w-60 xl:w-96">
 							<EmployeeSearch {employees} />
 						</div>
 					{/if}
