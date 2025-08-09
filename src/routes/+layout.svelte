@@ -17,7 +17,8 @@
 
 	NProgress.configure({
 		// Full list: https://github.com/rstacruz/nprogress#configuration
-		minimum: 0.16
+		minimum: 0.16,
+		showSpinner: false
 	});
 
 	$effect(() => {
