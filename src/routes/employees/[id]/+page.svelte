@@ -38,7 +38,8 @@
 	$effect(() => {
 		if (employee?.id) {
 			loading = false;
-			mobileFormVisible = false;
+			// Auto-expand form if no entries exist
+			mobileFormVisible = entries.length === 0;
 			newEntry = {
 				note: '',
 				rating: 3,
@@ -210,62 +211,105 @@
 				<!-- Performance Entries List -->
 				<div class="md:col-span-2">
 					<div class="max-h-[60vh] md:max-h-[70vh] overflow-y-auto">
-						{#each entries as entry (entry.id)}
-							<div class="bg-white shadow-md rounded-lg p-3 md:p-4 mb-4">
-								<div class="flex justify-between items-center">
-									<p class="text-lg font-semibold text-gray-700">{data.user?.username}</p>
-									<div class="flex items-center gap-2">
-										<StarRating rating={entry.rating} readOnly={true} size="w-4 h-4" />
-									</div>
-								</div>
-
-								<p
-									class="text-gray-600 mt-2"
-									class:line-clamp-2={!entry.showMore}
-									class:line-clamp-none={entry.showMore}
-								>
-									{entry.note}
-								</p>
-								{#if (entry.note?.length ?? 0) > 100}
-									<button
-										onclick={() => (entry.showMore = !entry.showMore)}
-										class="text-blue-500 text-sm cursor-pointer mt-1"
-										aria-label="Toggle full review text"
+						{#if entries.length === 0}
+							<div
+								class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
+							>
+								<div class="text-gray-400 mb-4">
+									<svg
+										class="mx-auto h-12 w-12"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
 									>
-										{entry.showMore ? 'Less' : 'More'}
-									</button>
-								{/if}
-
-								{#if Array.isArray(entry.tags) && entry.tags.length > 0}
-									<div class="flow-root mt-4">
-										<p class="float-right text-sm text-gray-500 pl-2">
-											{timeAgo(entry.xata.createdAt)}
-										</p>
-										<div class="flex flex-wrap gap-2">
-											{#each entry.tags as tagString}
-												{@const tagObject = tags.find((t) => t.name === tagString)}
-												{#if tagObject}
-													{@const rgbColor = hexToRgb((tagObject.color ?? '') as string)}
-													<span
-														class="px-2 py-1 text-xs font-semibold rounded-md"
-														style="--tag-color: {rgbColor}; --tag-color-dark: {darkenColor(
-															(tagObject.color ?? '#e5e7eb') as string,
-															40
-														)};"
-													>
-														{tagString}
-													</span>
-												{/if}
-											{/each}
-										</div>
-									</div>
-								{:else}
-									<div class="text-right text-sm text-gray-500 mt-2">
-										{timeAgo(entry.xata.createdAt)}
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+										/>
+									</svg>
+								</div>
+								<h3 class="text-lg font-medium text-gray-900 mb-2">No Performance Entries Yet</h3>
+								<p class="text-gray-500 mb-4 min-md:flex hidden">
+									This employee doesn't have any performance entries yet. Use the form on the left
+									to create the first entry.
+								</p>
+								<p class="text-gray-500 mb-4 max-md:flex hidden">
+									This employee doesn't have any performance entries yet. Use the form above to
+									create the first entry.
+								</p>
+								{#if !mobileFormVisible}
+									<div class="md:hidden">
+										<button
+											type="button"
+											onclick={() => (mobileFormVisible = true)}
+											class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+										>
+											<Plus class="w-4 h-4 mr-2" />
+											Add First Entry
+										</button>
 									</div>
 								{/if}
 							</div>
-						{/each}
+						{:else}
+							{#each entries as entry (entry.id)}
+								<div class="bg-white shadow-md rounded-lg p-3 md:p-4 mb-4">
+									<div class="flex justify-between items-center">
+										<p class="text-lg font-semibold text-gray-700">{data.user?.username}</p>
+										<div class="flex items-center gap-2">
+											<StarRating rating={entry.rating} readOnly={true} size="w-4 h-4" />
+										</div>
+									</div>
+
+									<p
+										class="text-gray-600 mt-2"
+										class:line-clamp-2={!entry.showMore}
+										class:line-clamp-none={entry.showMore}
+									>
+										{entry.note}
+									</p>
+									{#if (entry.note?.length ?? 0) > 100}
+										<button
+											onclick={() => (entry.showMore = !entry.showMore)}
+											class="text-blue-500 text-sm cursor-pointer mt-1"
+											aria-label="Toggle full review text"
+										>
+											{entry.showMore ? 'Less' : 'More'}
+										</button>
+									{/if}
+
+									{#if Array.isArray(entry.tags) && entry.tags.length > 0}
+										<div class="flow-root mt-4">
+											<p class="float-right text-sm text-gray-500 pl-2">
+												{timeAgo(entry.xata.createdAt)}
+											</p>
+											<div class="flex flex-wrap gap-2">
+												{#each entry.tags as tagString}
+													{@const tagObject = tags.find((t) => t.name === tagString)}
+													{#if tagObject}
+														{@const rgbColor = hexToRgb((tagObject.color ?? '') as string)}
+														<span
+															class="px-2 py-1 text-xs font-semibold rounded-md"
+															style="--tag-color: {rgbColor}; --tag-color-dark: {darkenColor(
+																(tagObject.color ?? '#e5e7eb') as string,
+																40
+															)};"
+														>
+															{tagString}
+														</span>
+													{/if}
+												{/each}
+											</div>
+										</div>
+									{:else}
+										<div class="text-right text-sm text-gray-500 mt-2">
+											{timeAgo(entry.xata.createdAt)}
+										</div>
+									{/if}
+								</div>
+							{/each}
+						{/if}
 					</div>
 				</div>
 			</div>

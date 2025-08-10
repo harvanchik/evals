@@ -60,3 +60,11 @@
 		{@render children()}
 	</main>
 </div>
+
+<style>
+	#nprogress .bar {
+		background: #ffbb00 !important;
+		padding: 0 10px !important;
+		height: 6px !important;
+	}
+</style>

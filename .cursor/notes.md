@@ -4,3 +4,4 @@
 - redesign for employee's page and how entries are displayed.
 - filter ability on employee's page to search text and filter by tags; filter by which user wrote an entry
 - show "no entries yet" message on employees page
+- switch to https://github.com/yisibell/trickling?tab=readme-ov-file (for more options and color ability) - more updated package
