@@ -40,11 +40,11 @@
 	}
 </script>
 
-<div class="flex items-center space-x-2">
+<div class="@container flex items-center space-x-2 flex-wrap">
 	{#if !readOnly}
-		<span class="text-sm text-gray-600">Poor</span>
+		<span class="text-sm hidden @[15rem]:flex text-gray-600 tracking-tight">Poor</span>
 	{/if}
-	<div class="flex space-x-0.5">
+	<div class="flex space-x-0.5 scale-80 @[15rem]:scale-100">
 		{#each stars as type, i (i)}
 			<div
 				class:cursor-pointer={!readOnly}
@@ -76,7 +76,7 @@
 		{/each}
 	</div>
 	{#if !readOnly}
-		<span class="text-sm text-gray-600">Excellent</span>
-		<span class="font-bold w-10 text-right">{rating.toFixed(1)}</span>
+		<span class="text-sm hidden @[15rem]:flex text-gray-600 tracking-tight">Excellent</span>
+		<span class="font-bold w-5 text-right">{rating.toFixed(1)}</span>
 	{/if}
 </div>

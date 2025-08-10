@@ -144,12 +144,6 @@
 							};
 						}}
 					>
-						<fieldset class="block">
-							<legend class="text-gray-700">Rating</legend>
-							<StarRating bind:rating={newEntry.rating} />
-							<input type="hidden" name="rating" value={newEntry.rating} />
-						</fieldset>
-
 						<label class="block">
 							<span class="text-gray-700">Note</span>
 							<textarea
@@ -164,6 +158,12 @@
 								<p class="text-red-500 text-sm mt-1">Note cannot be empty.</p>
 							{/if}
 						</label>
+
+						<fieldset class="block">
+							<legend class="text-gray-700">Rating</legend>
+							<StarRating bind:rating={newEntry.rating} />
+							<input type="hidden" name="rating" value={newEntry.rating} />
+						</fieldset>
 
 						<fieldset class="block">
 							<legend class="text-gray-700">Tags (Optional)</legend>
