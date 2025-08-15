@@ -125,20 +125,12 @@
 						use:enhance={() => {
 							loading = true;
 							return async ({ result, update }) => {
-								await update({ reset: false });
 								if (result.type === 'success' && result.status === 200) {
-									entries.unshift({
-										...newEntry,
-										id: `temp_${Date.now()}`,
-										xata: {
-											createdAt: new Date(),
-											updatedAt: new Date(),
-											version: 0
-										},
-										showMore: false
-									} as any);
+									// Reset form and hide mobile form
 									newEntry = { note: '', rating: 3, tags: [] };
 									mobileFormVisible = false;
+									// Update the page data to include the new entry
+									await update({ reset: false });
 								}
 								loading = false;
 							};
