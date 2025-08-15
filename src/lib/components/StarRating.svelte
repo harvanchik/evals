@@ -4,6 +4,7 @@
 		maxRating = 5,
 		color = 'gold',
 		readOnly = false,
+		isEntryCard = false,
 		size = 'w-6 h-6'
 	} = $props();
 
@@ -40,11 +41,11 @@
 	}
 </script>
 
-<div class="@container flex items-center space-x-2 flex-wrap">
+<div class="{isEntryCard ? '' : '@container'} flex items-center space-x-2 flex-wrap">
 	{#if !readOnly}
 		<span class="text-sm hidden @[15rem]:flex text-gray-600 tracking-tight">Poor</span>
 	{/if}
-	<div class="flex space-x-0.5 scale-80 @[15rem]:scale-100">
+	<div class="flex space-x-0.5 {isEntryCard ? 'scale-80 @[15rem]:scale-100' : ''}">
 		{#each stars as type, i (i)}
 			<div
 				class:cursor-pointer={!readOnly}

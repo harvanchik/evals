@@ -97,10 +97,10 @@
 			</h1>
 
 			<div
-				class="grid grid-cols-1 md:grid-cols-3 gap-8 px-4 py-6 md:px-6 md:py-8 max-w-7xl mx-auto"
+				class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-8 px-4 py-6 md:px-6 md:py-8 max-w-7xl mx-auto"
 			>
 				<!-- Create New Entry Form -->
-				<div class="md:sticky md:top-8 h-fit">
+				<div class="md:sticky md:top-8 h-fit md:col-span-2">
 					<div
 						class="flex items-center mb-2 cursor-pointer md:cursor-auto"
 						onclick={() => (mobileFormVisible = !mobileFormVisible)}
@@ -161,7 +161,7 @@
 
 						<fieldset class="block">
 							<legend class="text-gray-700">Rating</legend>
-							<StarRating bind:rating={newEntry.rating} />
+							<StarRating bind:rating={newEntry.rating} isEntryCard={false} />
 							<input type="hidden" name="rating" value={newEntry.rating} />
 						</fieldset>
 
@@ -209,11 +209,12 @@
 				</div>
 
 				<!-- Performance Entries List -->
-				<div class="md:col-span-2">
-					<div class="max-h-[60vh] md:max-h-[70vh] overflow-y-auto">
+				<div class="md:mt-[2.25rem] lg:col-span-3 md:col-span-2">
+					<!-- max-h-[60vh] md:max-h-[72vh] overflow-y-auto -->
+					<div class="">
 						{#if entries.length === 0}
 							<div
-								class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center"
+								class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center md:mt-[2.25rem]"
 							>
 								<div class="text-gray-400 mb-4">
 									<svg
@@ -258,7 +259,12 @@
 									<div class="flex justify-between items-center">
 										<p class="text-lg font-semibold text-gray-700">{data.user?.username}</p>
 										<div class="flex items-center gap-2">
-											<StarRating rating={entry.rating} readOnly={true} size="w-4 h-4" />
+											<StarRating
+												rating={entry.rating}
+												readOnly={true}
+												isEntryCard={true}
+												size="w-4 h-4"
+											/>
 										</div>
 									</div>
 
